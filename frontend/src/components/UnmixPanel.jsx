@@ -61,13 +61,13 @@ export default function UnmixPanel({
             {files.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.filename}
-                {f.n_events ? ` - ${Number(f.n_events).toLocaleString()} events` : ''}
+                {f.n_events ? ` (${Number(f.n_events).toLocaleString()} events)` : ''}
               </option>
             ))}
           </select>
         ) : (
           <span className="field__hint">
-            No files registered yet - drop a raw acquisition into <code>./fcs</code>.
+            No files registered yet. Drop a raw acquisition into <code>./fcs</code>.
           </span>
         )}
         <span className="field__hint">

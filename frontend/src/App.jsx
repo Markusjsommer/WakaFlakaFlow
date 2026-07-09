@@ -286,7 +286,7 @@ export default function App() {
         <section className="page-intro">
           <h1>Automated cell population identification</h1>
           <p className="app__sub">
-            Point at a spectral flow cytometry FCS file - WakaFlockaFlow transforms the
+            Point at a spectral flow cytometry FCS file. WakaFlockaFlow transforms the
             events, clusters them with FlowSOM, embeds them with UMAP, and returns named
             cell populations with counts, frequencies, and median-marker profiles.
             Everything runs locally; no data leaves your machine.

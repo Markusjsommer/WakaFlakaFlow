@@ -93,7 +93,7 @@ export default function PanelEditor({ sid, fileId, onApplied }) {
       }
       const res = await setPanelMarkers(sid, markers);
       const n = res && typeof res.n === 'number' ? res.n : Object.keys(markers).length;
-      setStatus(`Saved - ${n} marker name${n === 1 ? '' : 's'} mapped.`);
+      setStatus(`Saved: ${n} marker name${n === 1 ? '' : 's'} mapped.`);
       if (onApplied) await onApplied();
     } catch (e) {
       setError(e.message);
@@ -153,7 +153,7 @@ export default function PanelEditor({ sid, fileId, onApplied }) {
               {/* Channel -> marker grid ------------------------------------ */}
               <div className="field">
                 <span className="field__label">
-                  Channels - {channels.length}
+                  Channels: {channels.length}
                 </span>
                 <div style={grid}>
                   {channels.map((c) => {
