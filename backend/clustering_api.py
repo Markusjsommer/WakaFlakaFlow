@@ -30,6 +30,11 @@ from models import Session as SessionModel, FCSFile, Job
 from models_cluster import ClusteringRun, Population, palette_color
 from analysis import io as analysis_io
 from analysis import cluster
+from analysis import annotate as _annotate
+
+# Per-session channel -> marker-name overrides (the panel editor). Lets fluorophore-
+# named files (e.g. BUV395-A -> CD19) be annotated. Empty = use the file's own names.
+PANEL_MARKERS: dict[str, dict] = {}
 
 # The bundled real acquisition used as the fallback data source.
 import os as _os
@@ -266,6 +271,11 @@ def _run_clustering(job_id: str, run_id: str, sid: str, params: dict) -> None:
         labels = np.asarray(result["labels"]).astype(int)
         populations = result["populations"]
 
+        # auto-annotate populations with canonical cell types (editable afterwards)
+        annotations = _annotate.annotate_populations(
+            populations, channel_to_marker=PANEL_MARKERS.get(sid)
+        )
+
         # 75 ----------------------------------------------------------------- UMAP
         _update_job(job_id, progress=75, message="UMAP embedding")
         idx, xy = cluster.umap_coords(
@@ -287,7 +297,8 @@ def _run_clustering(job_id: str, run_id: str, sid: str, params: dict) -> None:
                         id=str(uuid.uuid4()),
                         clustering_run_id=run_id,
                         parent_id=None,
-                        name=f"Population {int(pop['metacluster_id']) + 1}",
+                        name=(annotations[order]["label"]
+                              or f"Population {int(pop['metacluster_id']) + 1}"),
                         metacluster_id=int(pop["metacluster_id"]),
                         cell_count=int(pop["cell_count"]),
                         percentage_of_parent=float(pop["percentage"]),
