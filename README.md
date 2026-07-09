@@ -1,4 +1,4 @@
-# WakaFlockaFlow - a no-code tool for automated spectral flow cytometry analysis
+# WakaFlockaFlow, a no-code tool for automated spectral flow cytometry analysis
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
@@ -6,16 +6,16 @@
 
 WakaFlockaFlow takes a spectral flow cytometry FCS file and, without any coding,
 produces named cell populations with counts, frequencies, and marker profiles.
-It runs a post-acquisition workflow - spectral unmixing, transformation, and
-automated population identification with cell-type annotation (FlowSOM + UMAP) -
-behind a browser interface, and exports a reproducibility bundle for every run.
+It runs a post-acquisition workflow behind a browser interface: spectral
+unmixing, transformation, and automated population identification with cell-type
+annotation (FlowSOM + UMAP). It exports a reproducibility bundle for every run.
 Cross-acquisition batch-correction engines (CytoNorm, ComBat) are included; a
 guided interface for them is on the roadmap.
 
 > WakaFlockaFlow is a **post-acquisition analysis** tool. It reads the standard
 > FCS files your instrument already exports (Cytek Aurora, Sony ID7000, BD
 > FACSymphony, and any other ISAC-compliant device). It does not control the
-> cytometer, and it does not sort cells - it analyzes what the instrument
+> cytometer, and it does not sort cells; it analyzes what the instrument
 > produced.
 
 > The tool is **self-hosted**: the application, the analysis engines, and the
@@ -23,8 +23,8 @@ guided interface for them is on the roadmap.
 > or result is ever uploaded. See [Privacy](#privacy).
 
 WakaFlockaFlow orchestrates established, peer-reviewed cytometry engines rather
-than reimplementing them. It is designed to slot into an existing workflow - it
-reads standard FCS and can round-trip gating definitions with FlowJo - rather
+than reimplementing them. It is designed to slot into an existing workflow: it
+reads standard FCS and can round-trip gating definitions with FlowJo, rather
 than to replace the tools a lab already uses.
 
 ## What it does
@@ -32,26 +32,26 @@ than to replace the tools a lab already uses.
 WakaFlockaFlow covers the post-acquisition workflow in stages, each usable on its
 own:
 
-* **Spectral unmixing** - resolves raw multi-detector signal into
+* **Spectral unmixing**: resolves raw multi-detector signal into
   per-fluorophore channels using single-stain controls, for instruments or
   experiments where only raw (mixed) FCS is available.
-* **Transformation** - arcsinh transformation with a per-channel cofactor;
+* **Transformation**: arcsinh transformation with a per-channel cofactor;
   scatter and time channels are held out of clustering by default.
-* **Automated population identification** - FlowSOM self-organizing-map
+* **Automated population identification**: FlowSOM self-organizing-map
   clustering with metaclustering, paired with a UMAP embedding for
   visualization. Populations are returned with cell counts, frequencies, and
   per-population median-marker tables, and can be renamed interactively.
-* **Automatic cell-type annotation** - a transparent marker-signature engine
+* **Automatic cell-type annotation**: a transparent marker-signature engine
   labels each population with a canonical cell type (CD4 T, CD8 T, B, NK,
   monocyte, dendritic-cell and other lineages); labels are editable, and
   populations with no confident match are left unlabelled rather than forced.
-* **Batch correction (engine)** - cross-acquisition normalization engines
+* **Batch correction (engine)**: cross-acquisition normalization engines
   (CytoNorm, with a ComBat fallback) are included and callable; a guided UI
   workflow for multi-batch correction is on the roadmap.
-* **Reproducibility export** - every run produces a `.zip` bundle with the
+* **Reproducibility export**: every run produces a `.zip` bundle with the
   population table, UMAP coordinates, the marker panel, run parameters, and
   engine versions.
-* **FlowJo interoperability** - export an augmented FCS plus a FlowJo workspace
+* **FlowJo interoperability**: export an augmented FCS plus a FlowJo workspace
   (`.wsp`) and a GatingML 2.0 file, so the automated populations open in FlowJo
   as named gates.
 
@@ -68,7 +68,7 @@ The first build downloads dependencies; subsequent starts are immediate. When
 the container is running, open <http://localhost:8000>.
 
 > The build bundles a small permissively-licensed demo dataset, so the tool is
-> usable immediately with no data of your own - the demo files are preloaded in
+> usable immediately with no data of your own; the demo files are preloaded in
 > the file selector, ready to run. See [Data](#bundled-data).
 
 ## Usage
@@ -82,13 +82,13 @@ are registered on startup and appear in the file selector.
     cp /path/to/your/*.fcs ./fcs/
     docker compose up
 
-The `fcs/` directory is mounted read-only - source files are never modified.
+The `fcs/` directory is mounted read-only, source files are never modified.
 Runtime state (the SQLite provenance database and exports) is written to
 `data/`.
 
 ### Identifying populations
 
-1. Select a file - the bundled demo is preloaded in the selector.
+1. Select a file (the bundled demo is preloaded in the selector).
 2. Choose the marker panel. The panel is built from the file's channels;
    fluorophore markers are pre-selected and scatter/time channels are excluded
    from clustering by default.
@@ -105,13 +105,13 @@ Runtime state (the SQLite provenance database and exports) is written to
 ### Cell-type annotation
 
 After clustering, each population is labelled with a canonical cell type by a
-transparent marker-signature engine - it z-scores each marker's median across
+transparent marker-signature engine: it z-scores each marker's median across
 populations and matches the high/low profile against known lineage signatures
 (CD4/CD8 T-cell subsets, B, NK, monocytes, dendritic cells, and more).
 Annotation requires **marker names**: files whose FCS carries them (including the
 bundled demo) are labelled out of the box. Fluorophore-only files (e.g. `BUV395-A`)
-are mapped in a built-in **panel editor** - assign a marker to each channel, with a
-bulk-paste option for large panels - after which populations are re-annotated
+are mapped in a built-in **panel editor**: assign a marker to each channel, with a
+bulk-paste option for large panels, after which populations are re-annotated
 instantly without re-clustering. All labels are editable.
 
 ### Spectral unmixing
@@ -122,8 +122,8 @@ identification.
 
 ### Batch correction
 
-Cross-acquisition normalization engines - **CytoNorm** (default) and a
-pure-Python **ComBat** fallback - are included and callable via the backend to
+Cross-acquisition normalization engines (**CytoNorm** by default, with a
+pure-Python **ComBat** fallback) are included and callable via the backend to
 make samples run on different days or instruments comparable. A guided
 multi-batch workflow in the interface is on the roadmap; it is not yet a
 point-and-click stage.
@@ -136,9 +136,9 @@ exports remain on the machine running the container.
 
 ## Bundled data
 
-The repository includes a small, permissively-licensed demo dataset -
+The repository includes a small, permissively-licensed demo dataset:
 **flowSpecs** example spectral data (Artistic-2.0), exported to FCS under
-`sample_data/spectral_pbmc/` - preloaded in the file selector so the tool is
+`sample_data/spectral_pbmc/`, preloaded in the file selector so the tool is
 usable with no data of your own. See
 [`NOTICE.md`](NOTICE.md) for details and provenance.
 
@@ -193,12 +193,12 @@ WakaFlockaFlow orchestrates several established libraries, each retaining its ow
 license and copyright. If you use WakaFlockaFlow in published work, please cite
 the underlying engines you rely on:
 
-* **FlowKit** - FCS I/O and transforms (White et al., *Front. Immunol.* 2021)
-* **FlowSOM** - clustering and metaclustering (Van Gassen et al., *Cytometry A*
+* **FlowKit**: FCS I/O and transforms (White et al., *Front. Immunol.* 2021)
+* **FlowSOM**: clustering and metaclustering (Van Gassen et al., *Cytometry A*
   2015)
-* **UMAP** - dimensionality reduction (McInnes et al., 2018)
-* **CytoNorm** - batch normalization (Van Gassen et al., *Cytometry A* 2020)
-* **flowCore / openCyto** - R data structures and gating (Hahne et al. 2009;
+* **UMAP**: dimensionality reduction (McInnes et al., 2018)
+* **CytoNorm**: batch normalization (Van Gassen et al., *Cytometry A* 2020)
+* **flowCore / openCyto**: R data structures and gating (Hahne et al. 2009;
   Finak et al. 2014)
 
 See [`NOTICE.md`](NOTICE.md) for the complete list of wrapped engines and their

@@ -39,16 +39,16 @@ available in the corresponding installed packages.
 
 ---
 
-## Bundled test data - NOT redistributed
+## Bundled test data, NOT redistributed
 
 The 40-color spectral reference acquisition used during development
 (`PBMC_40color_E1_UNMIXED.fcs`, "phitonex E1") is licensed **CC BY-ND**
 (Creative Commons Attribution-NoDerivatives). Because that license forbids
 distributing derivative/modified versions, this data file is **kept local and is
-git-ignored** - it is **not** included in this repository or in any release
+git-ignored**: it is **not** included in this repository or in any release
 artifact. See [`.gitignore`](.gitignore).
 
-## Bundled demo data - flowSpecs (permissive, redistributed)
+## Bundled demo data, flowSpecs (permissive, redistributed)
 
 The repository **does** bundle a small, permissively-licensed demo set: the
 **flowSpecs** example spectral data (**Artistic-2.0**), exported to FCS and kept
@@ -57,5 +57,5 @@ compatible with AGPL-3.0, so this set is safe to ship; it powers the out-of-the-
 demo (`fullPanel.fcs`). Source: <https://bioconductor.org/packages/flowSpecs/>.
 
 To analyze your own data, drop `.fcs` files into `./fcs/` and run
-`docker compose up` (see [`README.md`](README.md)) - they are registered alongside
+`docker compose up` (see [`README.md`](README.md)), they are registered alongside
 the bundled demo, and nothing leaves your machine.
