@@ -12,12 +12,14 @@ import {
   exportUrl,
   listUnmixControls,
   startUnmix,
+  reannotate,
 } from './api.js';
 import Controls from './components/Controls.jsx';
 import ProgressBar from './components/ProgressBar.jsx';
 import UmapScatter from './components/UmapScatter.jsx';
 import PopulationTable from './components/PopulationTable.jsx';
 import UnmixPanel from './components/UnmixPanel.jsx';
+import PanelEditor from './components/PanelEditor.jsx';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -153,6 +155,20 @@ export default function App() {
     }
   }
 
+  // Called after the panel editor saves a new channel->marker mapping. If a run is
+  // already on screen, re-annotate it in place so the population cell-type names
+  // update instantly without re-clustering. Otherwise the mapping simply applies
+  // on the next Run.
+  async function handleMarkersApplied() {
+    if (!sessionId || !run) return;
+    try {
+      const updated = await reannotate(sessionId, run.id);
+      if (updated) setRun(updated);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
   // Poll a job every 2s until it leaves the pending/running state.
   async function pollUnmixUntilDone(jobId) {
     for (;;) {
@@ -270,6 +286,12 @@ export default function App() {
 
         {mode === 'analyze' ? (
           <>
+            <PanelEditor
+              sid={sessionId}
+              fileId={selectedFileId || (analyzeFiles[0] && analyzeFiles[0].id)}
+              onApplied={handleMarkersApplied}
+            />
+
             <Controls
               key={selectedFileId || 'default'}
               onRun={handleRun}

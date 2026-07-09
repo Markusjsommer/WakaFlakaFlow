@@ -72,6 +72,10 @@ class PopulationPatch(BaseModel):
     color: str | None = None
 
 
+class PanelMarkersUpdate(BaseModel):
+    markers: dict[str, str] = Field(default_factory=dict)
+
+
 # --------------------------------------------------------------------------- helpers
 def _now() -> datetime:
     return datetime.now(timezone.utc)
@@ -183,6 +187,58 @@ def panel_template(sid: str, db: SASession = Depends(get_db)):
             }
         )
     return {"channels": channels}
+
+
+# --------------------------------------------------------------------------- panel markers
+@router.get("/sessions/{sid}/panel/markers")
+def get_panel_markers(sid: str, fcs_file_id: str | None = None, db: SASession = Depends(get_db)):
+    """Channel -> marker map that drives the panel editor / annotation.
+
+    marker precedence: a saved per-session override, else the file's own $PnS
+    marker label (only when it differs from the channel name), else "". Reuses the
+    same file resolution + marker_indices + scatter/Time logic as panel_template.
+    """
+    _require_session(db, sid)
+    path, _file_id = _resolve_path(db, sid, fcs_file_id)
+    try:
+        _events, channel_names, marker_labels = _load_cached(path)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"could not read panel: {exc}")
+
+    overrides = PANEL_MARKERS.get(sid, {})
+    include_idx = set(analysis_io.marker_indices(channel_names, exclude_scatter=True))
+    channels = []
+    for i, name in enumerate(channel_names):
+        upper = str(name).upper()
+        is_scatter = ("FSC" in upper) or ("SSC" in upper) or (upper == "TIME")
+        label = marker_labels[i] if i < len(marker_labels) else name
+        marker = overrides.get(name)
+        if not marker:
+            marker = str(label) if (label and str(label) != str(name)) else ""
+        channels.append(
+            {
+                "channel_name": name,
+                "marker": marker,
+                "is_scatter": bool(is_scatter),
+                "include_in_clustering": i in include_idx,
+            }
+        )
+    return {"channels": channels}
+
+
+@router.put("/sessions/{sid}/panel/markers")
+def set_panel_markers(sid: str, req: PanelMarkersUpdate, db: SASession = Depends(get_db)):
+    """Merge channel->marker overrides into the session map. A blank/empty marker
+    clears that channel's override."""
+    _require_session(db, sid)
+    current = PANEL_MARKERS.setdefault(sid, {})
+    for channel, marker in (req.markers or {}).items():
+        value = (marker or "").strip()
+        if value:
+            current[channel] = value
+        else:
+            current.pop(channel, None)
+    return {"ok": True, "n": len([v for v in current.values() if v])}
 
 
 # --------------------------------------------------------------------------- start clustering
@@ -375,6 +431,38 @@ def get_clustering(sid: str, rid: str, db: SASession = Depends(get_db)):
     if run is None or run.session_id != sid:
         raise HTTPException(status_code=404, detail="clustering run not found")
     return _run_payload(run)
+
+
+@router.post("/sessions/{sid}/clustering/{rid}/reannotate")
+def reannotate_clustering(sid: str, rid: str):
+    """Re-label a run's populations from the CURRENT panel markers, without
+    re-clustering. Returns the same shape as GET /clustering/{rid}."""
+    db = SessionLocal()
+    try:
+        run = db.get(ClusteringRun, rid)
+        if run is None or run.session_id != sid:
+            raise HTTPException(status_code=404, detail="clustering run not found")
+        pops = sorted(run.populations, key=lambda p: p.metacluster_id)
+        pop_dicts = [
+            {
+                "metacluster_id": p.metacluster_id,
+                "cell_count": p.cell_count,
+                "percentage": p.percentage_of_parent,
+                "median_expression": p.median_expression or {},
+            }
+            for p in pops
+        ]
+        annotations = _annotate.annotate_populations(
+            pop_dicts, channel_to_marker=PANEL_MARKERS.get(sid)
+        )
+        for order, p in enumerate(pops):
+            label = annotations[order]["label"] if order < len(annotations) else None
+            p.name = label or f"Population {int(p.metacluster_id) + 1}"
+        db.commit()
+        db.refresh(run)
+        return _run_payload(run)
+    finally:
+        db.close()
 
 
 @router.get("/sessions/{sid}/clustering/{rid}/populations")
