@@ -6,10 +6,11 @@
 
 WakaFlakaFlow takes a spectral flow cytometry FCS file and, without any coding,
 produces named cell populations with counts, frequencies, and marker profiles.
-It runs a complete post-acquisition workflow — spectral unmixing, quality
-control and transformation, automated population identification (FlowSOM +
-UMAP), and cross-sample batch correction — behind a browser interface, and
-exports a reproducibility bundle for every run.
+It runs a post-acquisition workflow — spectral unmixing, transformation, and
+automated population identification with cell-type annotation (FlowSOM + UMAP) —
+behind a browser interface, and exports a reproducibility bundle for every run.
+Cross-acquisition batch-correction engines (CytoNorm, ComBat) are included; a
+guided interface for them is on the roadmap.
 
 > WakaFlakaFlow is a **post-acquisition analysis** tool. It reads the standard
 > FCS files your instrument already exports (Cytek Aurora, Sony ID7000, BD
@@ -34,16 +35,19 @@ own:
 * **Spectral unmixing** — resolves raw multi-detector signal into
   per-fluorophore channels using single-stain controls, for instruments or
   experiments where only raw (mixed) FCS is available.
-* **Quality control and transformation** — arcsinh transformation with a
-  per-channel cofactor; scatter and time channels are held out of clustering by
-  default.
+* **Transformation** — arcsinh transformation with a per-channel cofactor;
+  scatter and time channels are held out of clustering by default.
 * **Automated population identification** — FlowSOM self-organizing-map
   clustering with metaclustering, paired with a UMAP embedding for
   visualization. Populations are returned with cell counts, frequencies, and
   per-population median-marker tables, and can be renamed interactively.
-* **Batch correction** — cross-acquisition normalization (CytoNorm, with a
-  ComBat fallback) so samples run on different days or instruments are
-  comparable.
+* **Automatic cell-type annotation** — a transparent marker-signature engine
+  labels each population with a canonical cell type (CD4 T, CD8 T, B, NK,
+  monocyte, dendritic-cell and other lineages); labels are editable, and
+  populations with no confident match are left unlabelled rather than forced.
+* **Batch correction (engine)** — cross-acquisition normalization engines
+  (CytoNorm, with a ComBat fallback) are included and callable; a guided UI
+  workflow for multi-batch correction is on the roadmap.
 * **Reproducibility export** — every run produces a `.zip` bundle with the
   population table, UMAP coordinates, the marker panel, run parameters, and
   engine versions.
@@ -61,8 +65,8 @@ The first build downloads dependencies; subsequent starts are immediate. When
 the container is running, open <http://localhost:8000>.
 
 > The build bundles a small permissively-licensed demo dataset, so the tool is
-> usable immediately with no data of your own — click **Load demo** in the
-> interface. See [Data](#bundled-data).
+> usable immediately with no data of your own — the demo files are preloaded in
+> the file selector, ready to run. See [Data](#bundled-data).
 
 ## Usage
 
@@ -81,7 +85,7 @@ Runtime state (the SQLite provenance database and exports) is written to
 
 ### Identifying populations
 
-1. Select a file, or click **Load demo**.
+1. Select a file — the bundled demo is preloaded in the selector.
 2. Choose the marker panel. The panel is built from the file's channels;
    fluorophore markers are pre-selected and scatter/time channels are excluded
    from clustering by default.
@@ -89,9 +93,22 @@ Runtime state (the SQLite provenance database and exports) is written to
 4. Run. The backend transforms the events, runs FlowSOM, and computes a UMAP
    embedding, streaming progress through the interface.
 5. Inspect results: a UMAP scatter colored by population, and a population table
-   with counts, frequencies, and top median markers. Rename populations inline;
-   hovering a table row highlights that population on the embedding.
+   with counts, frequencies, and top median markers. Each population is
+   automatically labelled with a cell type where the panel's markers support one
+   (see below). Rename populations inline; hovering a table row highlights that
+   population on the embedding.
 6. Export the reproducibility bundle (`.zip`).
+
+### Cell-type annotation
+
+After clustering, each population is labelled with a canonical cell type by a
+transparent marker-signature engine — it z-scores each marker's median across
+populations and matches the high/low profile against known lineage signatures
+(CD4/CD8 T-cell subsets, B, NK, monocytes, dendritic cells, and more).
+Annotation requires **marker names**: files whose FCS carries them (including the
+bundled demo) are labelled out of the box, while fluorophore-only files need a
+per-channel marker mapping first — a panel-editor step that is on the roadmap.
+All labels are editable.
 
 ### Spectral unmixing
 
@@ -101,8 +118,11 @@ identification.
 
 ### Batch correction
 
-To compare acquisitions across batches, run batch correction over a set of
-files before clustering. CytoNorm is used by default, with ComBat as a fallback.
+Cross-acquisition normalization engines — **CytoNorm** (default) and a
+pure-Python **ComBat** fallback — are included and callable via the backend to
+make samples run on different days or instruments comparable. A guided
+multi-batch workflow in the interface is on the roadmap; it is not yet a
+point-and-click stage.
 
 ## Privacy
 
@@ -114,7 +134,8 @@ exports remain on the machine running the container.
 
 The repository includes a small, permissively-licensed demo dataset —
 **flowSpecs** example spectral data (Artistic-2.0), exported to FCS under
-`sample_data/spectral_pbmc/` — which powers the **Load demo** button. See
+`sample_data/spectral_pbmc/` — preloaded in the file selector so the tool is
+usable with no data of your own. See
 [`NOTICE.md`](NOTICE.md) for details and provenance.
 
 The 40-color reference acquisition used during development ("phitonex E1") is
