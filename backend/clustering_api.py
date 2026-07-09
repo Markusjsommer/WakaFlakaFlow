@@ -8,7 +8,7 @@ Endpoints under /api/v1 that drive the population-ID workflow:
   * export           - reproducibility bundle (.zip: CSVs + provenance)
 
 Long-running work is submitted to ``jobs.executor`` (the shared ThreadPoolExecutor) and
-each DB write inside a worker uses a FRESH ``SessionLocal()`` — worker threads must never
+each DB write inside a worker uses a FRESH ``SessionLocal()`` - worker threads must never
 share the request-scoped session. The frontend polls GET /api/v1/jobs/{id} for progress.
 """
 from __future__ import annotations
@@ -564,7 +564,7 @@ def export_clustering(sid: str, rid: str, db: SASession = Depends(get_db)):
     # ------------------------------------------------------- session_info.txt
     versions = _tool_versions()
     info_lines = [
-        "WakaFlakaFlow — Automated Cell Population Identification",
+        "WakaFlockaFlow - Automated Cell Population Identification",
         "Reproducibility bundle",
         "",
         f"session_id: {sid}",
@@ -585,7 +585,7 @@ def export_clustering(sid: str, rid: str, db: SASession = Depends(get_db)):
 
     # ------------------------------------------------------- README_provenance.txt
     readme = (
-        "WakaFlakaFlow — Reproducibility Bundle\n"
+        "WakaFlockaFlow - Reproducibility Bundle\n"
         "======================================\n\n"
         "This archive documents one automated population-identification run.\n\n"
         "Contents:\n"
@@ -612,7 +612,95 @@ def export_clustering(sid: str, rid: str, db: SASession = Depends(get_db)):
         zf.writestr("README_provenance.txt", readme)
     zip_buf.seek(0)
 
-    filename = f"wakaflaka_populations_{rid}.zip"
+    filename = f"wakaflocka_populations_{rid}.zip"
+    return StreamingResponse(
+        zip_buf,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+# --------------------------------------------------------------------------- FlowJo export
+@router.get("/sessions/{sid}/clustering/{rid}/flowjo")
+def flowjo_export(sid: str, rid: str, db: SASession = Depends(get_db)):
+    """FlowJo interoperability bundle (.zip): the run's automated populations as
+    NAMED gates a user can open directly in FlowJo.
+
+    Re-runs the deterministic clustering with the run's stored params to recover
+    the per-cell metacluster labels (they are not persisted), then builds an
+    augmented FCS + FlowJo workspace + GatingML 2.0 where each population is a
+    named 1-D RectangleGate on a synthetic ``Population`` parameter.
+    """
+    import shutil
+    import tempfile
+
+    from analysis import flowjo as _flowjo
+
+    run = db.get(ClusteringRun, rid)
+    if run is None or run.session_id != sid:
+        raise HTTPException(status_code=404, detail="clustering run not found")
+
+    params = run.params or {}
+
+    # Recover the event matrix + per-cell labels by re-running (deterministic) clustering.
+    path, _file_id = _resolve_path(db, sid, params.get("fcs_file_id"))
+    try:
+        events, channel_names, _labels = _load_cached(path)
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(status_code=500, detail=f"could not read FCS: {exc}")
+
+    marker_idx = _resolve_marker_idx(channel_names, params.get("markers"))
+    result = cluster.run_flowsom(
+        events,
+        channel_names,
+        marker_idx,
+        xdim=int(params.get("xdim", 10)),
+        ydim=int(params.get("ydim", 10)),
+        n_clusters=int(params.get("n_clusters", 10)),
+        seed=int(params.get("seed", 42)),
+    )
+    labels = np.asarray(result["labels"]).astype(int)
+
+    # Populations {metacluster_id, name} from the run, ordered by metacluster id.
+    pops = sorted(run.populations, key=lambda p: p.metacluster_id)
+    populations = [{"metacluster_id": int(p.metacluster_id), "name": p.name} for p in pops]
+
+    readme = (
+        "WakaFlockaFlow - FlowJo Interoperability Export\n"
+        "==============================================\n\n"
+        "Open workspace.wsp in FlowJo. Each automated population is a named gate\n"
+        "on the \"Population\" parameter of analyzed.fcs.\n\n"
+        "Contents:\n"
+        "  analyzed.fcs   - the analyzed events with one extra parameter, \"Population\",\n"
+        "                   holding this cell's population number (metacluster id + 1).\n"
+        "  workspace.wsp  - FlowJo workspace: open this. It references analyzed.fcs and\n"
+        "                   defines one named RectangleGate per automated population,\n"
+        "                   each selecting exactly its cluster on the Population parameter.\n"
+        "  gating.xml     - the same gates as a portable GatingML 2.0 document.\n\n"
+        "Each gate is named after its population (cell type). A gate on the Population\n"
+        "parameter spanning [n-0.5 .. n+0.5] selects population number n.\n"
+    )
+
+    tmpdir = tempfile.mkdtemp(prefix="flowjo_")
+    try:
+        try:
+            paths = _flowjo.build_flowjo_export(
+                events, channel_names, labels, populations, tmpdir
+            )
+        except Exception as exc:  # noqa: BLE001
+            raise HTTPException(status_code=500, detail=f"FlowJo export failed: {exc}")
+
+        zip_buf = _io.BytesIO()
+        with zipfile.ZipFile(zip_buf, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.write(paths["fcs"], "analyzed.fcs")
+            zf.write(paths["wsp"], "workspace.wsp")
+            zf.write(paths["gatingml"], "gating.xml")
+            zf.writestr("README.txt", readme)
+        zip_buf.seek(0)
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+    filename = f"wakaflocka_flowjo_{rid}.zip"
     return StreamingResponse(
         zip_buf,
         media_type="application/zip",

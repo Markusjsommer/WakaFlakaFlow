@@ -10,6 +10,7 @@ import {
   getClusteringRun,
   renamePopulation,
   exportUrl,
+  flowjoUrl,
   listUnmixControls,
   startUnmix,
   reannotate,
@@ -241,7 +242,7 @@ export default function App() {
         <div className="site-header__inner">
           <div className="wordmark">
             <span className="wordmark__mark" aria-hidden="true" />
-            <span className="wordmark__name">WakaFlakaFlow</span>
+            <span className="wordmark__name">WakaFlockaFlow</span>
             <span className="wordmark__tag">Spectral cytometry analysis</span>
           </div>
           {sessionId && (
@@ -262,7 +263,7 @@ export default function App() {
         <section className="page-intro">
           <h1>Automated cell population identification</h1>
           <p className="app__sub">
-            Point at a spectral flow cytometry FCS file - WakaFlakaFlow transforms the
+            Point at a spectral flow cytometry FCS file - WakaFlockaFlow transforms the
             events, clusters them with FlowSOM, embeds them with UMAP, and returns named
             cell populations with counts, frequencies, and median-marker profiles.
             Everything runs locally; no data leaves your machine.
@@ -361,13 +362,29 @@ export default function App() {
                 <h2 className="card__title" style={{ margin: 0 }}>
                   Populations
                 </h2>
-                <a
-                  className="run-btn"
-                  href={exportUrl(sessionId, run.id)}
-                  style={{ textDecoration: 'none' }}
-                >
-                  Export results (.zip)
-                </a>
+                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <a
+                    className="run-btn"
+                    href={exportUrl(sessionId, run.id)}
+                    style={{ textDecoration: 'none' }}
+                  >
+                    Export results (.zip)
+                  </a>
+                  <a
+                    className="run-btn"
+                    href={flowjoUrl(sessionId, run.id)}
+                    title="Augmented FCS + workspace.wsp + GatingML — opens in FlowJo as named gates"
+                    style={{
+                      textDecoration: 'none',
+                      background: '#fff',
+                      color: 'var(--accent-dark)',
+                      border: '1px solid var(--accent)',
+                      boxShadow: 'none',
+                    }}
+                  >
+                    Export for FlowJo (.wsp)
+                  </a>
+                </div>
               </div>
               <PopulationTable
                 populations={populations}

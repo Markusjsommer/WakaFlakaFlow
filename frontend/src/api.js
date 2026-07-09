@@ -138,3 +138,9 @@ export async function renamePopulation(sid, rid, pid, body) {
 export function exportUrl(sid, rid) {
   return `${BASE}/sessions/${sid}/clustering/${rid}/export`;
 }
+
+// Direct-download URL for the FlowJo bundle: augmented FCS + workspace.wsp +
+// GatingML, so the populations open in FlowJo as named gates.
+export function flowjoUrl(sid, rid) {
+  return `${BASE}/sessions/${sid}/clustering/${rid}/flowjo`;
+}
