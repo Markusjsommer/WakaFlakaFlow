@@ -1,5 +1,5 @@
 # CytoNorm-in-a-box. Built once; invoked per job via `docker run`.
-# Long pole of the 1-day build — build this FIRST, in the background.
+# Long pole of the 1-day build - build this FIRST, in the background.
 #
 #   docker build -f backend/docker/Dockerfile.r -t wakaflaka-r:cytonorm .
 #   docker run --rm wakaflaka-r:cytonorm Rscript -e 'library(CytoNorm); cat("ok\n")'

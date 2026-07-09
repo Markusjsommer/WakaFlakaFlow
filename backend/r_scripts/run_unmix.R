@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# run_unmix.R — spectral unmixing via AutoSpectral (DrCytometer/AutoSpectral, AGPL-3.0).
+# run_unmix.R - spectral unmixing via AutoSpectral (DrCytometer/AutoSpectral, AGPL-3.0).
 # Raw detector FCS + single-stain controls -> per-marker unmixed FCS.
 #
 # Validated on the flowSpecs Aurora PBMC set: the unmixed output passes the biology

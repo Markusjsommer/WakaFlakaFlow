@@ -86,18 +86,18 @@ export default function Controls({ onRun, disabled, files = [], channels = [] })
             {files.map((f) => (
               <option key={f.id} value={f.id}>
                 {f.filename}
-                {f.n_events ? ` — ${Number(f.n_events).toLocaleString()} events` : ''}
+                {f.n_events ? ` - ${Number(f.n_events).toLocaleString()} events` : ''}
               </option>
             ))}
           </select>
         ) : (
           <span className="field__hint">
-            No files registered yet — the bundled demo acquisition will be used.
+            No files registered yet - the bundled demo acquisition will be used.
           </span>
         )}
         <span className="field__hint">
           Drop your own <code>.fcs</code> into <code>./fcs</code> (see README) or run the
-          bundled demo panel out of the box. Nothing is uploaded anywhere — all analysis
+          bundled demo panel out of the box. Nothing is uploaded anywhere - all analysis
           runs locally.
         </span>
       </label>
@@ -105,7 +105,7 @@ export default function Controls({ onRun, disabled, files = [], channels = [] })
       {/* Marker panel ----------------------------------------------------- */}
       <div className="field">
         <span className="field__label">
-          Markers for clustering — <strong>{nSelected}</strong> of {nMarkers} selected{' '}
+          Markers for clustering - <strong>{nSelected}</strong> of {nMarkers} selected{' '}
           <button type="button" className="link-btn" onClick={selectAll} disabled={disabled} style={linkBtn}>
             all
           </button>{' '}

@@ -30,11 +30,11 @@ DATA_DIR = REPO_ROOT / "data"
 JOBS_DIR = DATA_DIR / "jobs"
 EXPORTS_DIR = DATA_DIR / "exports"
 
-# Mandatory integrity banner — surfaced on every screen and in every export.
-BANNER = "SYNTHETIC BATCH EFFECT — mechanism demo, not real multi-batch data"
+# Mandatory integrity banner - surfaced on every screen and in every export.
+BANNER = "SYNTHETIC BATCH EFFECT - mechanism demo, not real multi-batch data"
 
 SYNTHETIC_WARNING = (
-    "SYNTHETIC BATCH EFFECT — READ THIS FIRST\n"
+    "SYNTHETIC BATCH EFFECT - READ THIS FIRST\n"
     "========================================\n\n"
     "The results in this export were produced by INJECTING a known, artificial batch\n"
     "effect (a monotone per-marker drift x' = a*x + b) into a SINGLE real acquisition\n"

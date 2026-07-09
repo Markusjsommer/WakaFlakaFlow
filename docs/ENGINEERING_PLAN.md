@@ -1,4 +1,4 @@
-# WakaFlakaFlow — Prototype Engineering Plan (1-day)
+# WakaFlakaFlow - Prototype Engineering Plan (1-day)
 
 *Derived from `WakaFlakaFlow_PRD_v2.md`, `spectral_gating_proposal.md`,
 `gating_automation_landscape.md`, `DATASET_COMPARISON.md`.*
@@ -13,11 +13,11 @@
 
 ## 0. Reality check (read first)
 
-### The data honesty problem — non-negotiable framing
+### The data honesty problem - non-negotiable framing
 The only real data on hand is a **single acquisition**: `PBMC_40color_E1_UNMIXED.fcs`
 (132,360 events × 47 channels = 40 markers + scatter, Cytek Aurora U0363, 28-Feb-2020) and
 its raw/mixed twin. One sample, one batch, one instrument, one day. Real CytoNorm cannot
-run on one batch — there is no batch axis to normalize.
+run on one batch - there is no batch axis to normalize.
 
 So the demo **injects a synthetic batch effect** into this file and shows CytoNorm removing
 it. This is a legitimate, standard way to *validate a normalization pipeline* (recover a
@@ -25,11 +25,11 @@ known injected drift), and it exercises the entire real stack (FlowKit I/O → R
 EMD diagnostics). **It is NOT a real multi-batch biological result.** Every screen and the
 export report must carry a banner:
 
-> ⚠ SYNTHETIC BATCH EFFECT — drift was injected artificially into a single acquisition to
+> ⚠ SYNTHETIC BATCH EFFECT - drift was injected artificially into a single acquisition to
 > validate the CytoNorm pipeline. This is a mechanism/plumbing demo, not real multi-batch data.
 
 Do not let anyone present this as a real cohort result. The real batch-robustness
-demonstration (proposal demo #3) needs a genuine multi-day/multi-instrument dataset — a
+demonstration (proposal demo #3) needs a genuine multi-day/multi-instrument dataset - a
 Phase-2 data-acquisition task, not tomorrow.
 
 ### License note
@@ -44,7 +44,7 @@ openCyto template gating, WebGL million-event rendering, Tauri. All map to PRD P
 
 ---
 
-## 1. Demo definition — the vertical slice that must work tomorrow
+## 1. Demo definition - the vertical slice that must work tomorrow
 
 ```
 Load UNMIXED fcs → transform → SYNTHETIC SPLIT into pseudo-batches + shared control
@@ -62,7 +62,7 @@ browser, one click.
 
 ---
 
-## 2. Synthetic batch design (the scientific crux — get this right)
+## 2. Synthetic batch design (the scientific crux - get this right)
 
 **Split.** Randomly partition the 132,360 events into 2 pseudo-batches, A and B (random →
 identical underlying biology, so any post-split difference is purely the injected effect).
@@ -119,7 +119,7 @@ CytoNorm train+apply. Smallest possible R surface = lowest 1-day risk.
 ```
 
 This is a **minimal instance of the PRD §2.5 Python↔R IPC** (job dir, `params.json`,
-`error.json`), scoped to one job type. Exchange format is **FCS**, not parquet — flowCore
+`error.json`), scoped to one job type. Exchange format is **FCS**, not parquet - flowCore
 reads FCS natively and CytoNorm operates on flowSet/flowFrame, so no `arrow`-in-R
 dependency. Python writes batch + control FCS in; R writes corrected FCS out.
 
@@ -141,7 +141,7 @@ scikit-learn>=1.4
 sqlalchemy>=2.0
 pydantic>=2.0
 python-multipart
-combat>=0.3.3             # pyComBat — BREAK-GLASS fallback only
+combat>=0.3.3             # pyComBat - BREAK-GLASS fallback only
 ```
 R (inside Docker only):
 ```
@@ -179,7 +179,7 @@ WakaFlakaFlow/
 
 ## 6. Task breakdown (critical path, ~9.5 h + buffer)
 
-**T0 is the long pole — start the Docker build FIRST and let it bake in the background
+**T0 is the long pole - start the Docker build FIRST and let it bake in the background
 while you write Python.**
 
 | # | Task | Est | Notes |
@@ -193,14 +193,14 @@ while you write Python.**
 | **T6** | FastAPI wrap: `POST /batch-correction` → threaded job → progress → `GET` results; `GET /jobs/{id}` poll | 1.25 h | locks 2s poll contract |
 | **T7** | React: synthetic banner, run btn, progress bar, before/after density (Plotly, per-marker dropdown), EMD table, UMAP pair | 2 h | biggest FE block |
 | **T8** | Export: corrected FCS + emd_stats.csv + injected params + plots → zip; README one-command run | 1 h | |
-| **T9** | End-to-end on E1, fix, rehearse demo | 1 h | **reserve — do not skip** |
+| **T9** | End-to-end on E1, fix, rehearse demo | 1 h | **reserve - do not skip** |
 
 **Cut order if behind:** drop UMAP (T5) → drop per-marker dropdown, show 4 fixed markers
-(T7) → drop zip, download loose files (T8). **Never cut** T2/T3(or fallback)/T4/T9 — that
+(T7) → drop zip, download loose files (T8). **Never cut** T2/T3(or fallback)/T4/T9 - that
 is the irreducible demo.
 
 **Break-glass (if T0/T3 R path fails by time-box):** swap `cytonorm.py` to call pyComBat
-(pure Python, already in requirements). Everything else — split, drift, EMD, UMAP, UI —
+(pure Python, already in requirements). Everything else - split, drift, EMD, UMAP, UI -
 is unchanged. The demo still shows before/after collapse; you just say "ComBat" instead of
 "CytoNorm" and note CytoNorm-in-R is the Phase-2 engine. This guarantees something ships.
 
@@ -266,7 +266,7 @@ If 3→8 runs on E1 with EMD visibly collapsing, the prototype is a success.
 
 ## 11. Immediate next action
 
-Kick off **T0 (Docker R image build)** now — it's the long pole and can bake in the
+Kick off **T0 (Docker R image build)** now - it's the long pole and can bake in the
 background while the rest is built. `docker/Dockerfile.r` and `r_scripts/run_cytonorm.R`
 skeletons are written alongside this plan.
 ```

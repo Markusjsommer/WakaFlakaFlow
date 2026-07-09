@@ -1,4 +1,4 @@
-"""FastAPI app for WakaFlakaFlow — automated cell-population identification.
+"""FastAPI app for WakaFlakaFlow - automated cell-population identification.
 
 Point at an FCS file -> arcsinh transform -> FlowSOM clustering + UMAP -> named cell
 populations with count/percentage/median-marker tables -> reproducibility export.

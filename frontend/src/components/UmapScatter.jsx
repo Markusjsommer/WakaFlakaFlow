@@ -52,7 +52,7 @@ export default function UmapScatter({ umap, populations, highlightMc }) {
     if (!ref.current) return;
     const data = buildTraces(umap, populations, highlightMc);
     const layout = {
-      title: { text: 'UMAP — cells coloured by population' },
+      title: { text: 'UMAP - cells coloured by population' },
       margin: { t: 48, r: 16, b: 48, l: 48 },
       xaxis: { title: 'UMAP-1', zeroline: false, showgrid: false },
       yaxis: { title: 'UMAP-2', zeroline: false, showgrid: false },

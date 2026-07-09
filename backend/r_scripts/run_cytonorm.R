@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# run_cytonorm.R — the ONLY R in the day-1 build. Reads a job dir, runs real
+# run_cytonorm.R - the ONLY R in the day-1 build. Reads a job dir, runs real
 # CytoNorm (control-based batch normalization), writes corrected FCS back out.
 # Python owns everything else (split, drift injection, EMD, UMAP, UI).
 #

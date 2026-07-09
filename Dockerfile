@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 #
-# WakaFlakaFlow — single combined image: Python backend + R engines + built SPA.
+# WakaFlakaFlow - single combined image: Python backend + R engines + built SPA.
 # The React app is compiled to static assets and served by FastAPI, and the R
 # spectral engines (AutoSpectral unmixing; FlowSOM/flowWorkspace) run in-process
 # via Rscript. One `docker compose up`, one port, no external services.
@@ -11,7 +11,7 @@
 # First build is long; subsequent builds are cached.
 
 # ---------------------------------------------------------------------------
-# Stage 1 — build the frontend (Vite + React) into static assets.
+# Stage 1 - build the frontend (Vite + React) into static assets.
 # ---------------------------------------------------------------------------
 FROM node:20-slim AS frontend
 WORKDIR /fe
@@ -21,7 +21,7 @@ COPY frontend/ ./
 RUN npm run build
 
 # ---------------------------------------------------------------------------
-# Stage 2 — R (Bioconductor) + Python runtime.
+# Stage 2 - R (Bioconductor) + Python runtime.
 # ---------------------------------------------------------------------------
 FROM bioconductor/bioconductor_docker:RELEASE_3_20
 

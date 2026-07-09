@@ -10,7 +10,7 @@ frontend/dist/
 # Runtime data + generated artifacts (job dirs, corrected FCS, sqlite, exports)
 data/
 
-# Derived/modified FCS must NOT be committed — phitonex E1 is CC BY-ND
+# Derived/modified FCS must NOT be committed - phitonex E1 is CC BY-ND
 # (NoDerivatives). Keep raw inputs out of the repo too; cite/link instead.
 *.fcs
 *.wsp

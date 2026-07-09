@@ -9,8 +9,8 @@ from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# Mandatory integrity guardrail — surfaced on every screen and in exports.
-BANNER = "SYNTHETIC BATCH EFFECT — mechanism demo, not real multi-batch data"
+# Mandatory integrity guardrail - surfaced on every screen and in exports.
+BANNER = "SYNTHETIC BATCH EFFECT - mechanism demo, not real multi-batch data"
 
 
 # ---- sessions ----------------------------------------------------------------
@@ -98,7 +98,7 @@ class BatchCorrectionRunResponse(BaseModel):
 # ---- jobs --------------------------------------------------------------------
 
 class JobStatusResponse(BaseModel):
-    """GET /jobs/{job_id} — polled every 2s while pending/running."""
+    """GET /jobs/{job_id} - polled every 2s while pending/running."""
 
     model_config = ConfigDict(from_attributes=True)
 

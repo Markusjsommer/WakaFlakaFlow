@@ -5,7 +5,7 @@ positive/negative markers. For a set of populations we z-score every marker's
 median across populations, decide which markers are high/low per population,
 then score each population against every signature and assign the best match.
 
-No training, no reference dataset — auditable and editable, matching the tool's
+No training, no reference dataset - auditable and editable, matching the tool's
 "named, defensible populations" thesis. Extend CELL_TYPES to recognise more.
 
 Panel-agnostic: the caller supplies a channel->marker mapping (identity when the

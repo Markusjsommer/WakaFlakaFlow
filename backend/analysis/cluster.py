@@ -6,7 +6,7 @@ cells into metaclusters (candidate populations) using the verified Python ``flow
 visualization.
 
 Heavy engine imports (anndata, flowsom, umap) are done lazily inside the functions so
-this module — and the API router that imports it — always loads even before those
+this module - and the API router that imports it - always loads even before those
 optional dependencies are installed.
 """
 from __future__ import annotations

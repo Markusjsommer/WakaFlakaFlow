@@ -1,6 +1,6 @@
-# WakaFlakaFlow — Product Requirements Document
+# WakaFlakaFlow - Product Requirements Document
 
-*Integrated v2 — Layers 1–4 with Amendment A applied.*
+*Integrated v2 - Layers 1–4 with Amendment A applied.*
 *Amendment A fixes: (1) FlowJo .wsp export in ExportBundle, (2) openCyto hierarchical*
 *gating mode (GatingTemplate entity + 10 API endpoints + Section 3.6 params),*
 *(3) Python↔R subprocess IPC protocol (Section 2.5), (4) Tauri desktop packaging (Section 4.6).*
@@ -9,14 +9,14 @@
 
 ## Table of Contents
 
-1. Layer 1 — UI/UX Specification
-2. Layer 2 — API & Data Model Specification (incl. §2.5 IPC Protocol)
-3. Layer 3 — Algorithm Parameter Defaults (incl. §3.6 OpenCyto)
-4. Layer 4 — Dependency Versions (incl. §4.6 Tauri Desktop)
+1. Layer 1 - UI/UX Specification
+2. Layer 2 - API & Data Model Specification (incl. §2.5 IPC Protocol)
+3. Layer 3 - Algorithm Parameter Defaults (incl. §3.6 OpenCyto)
+4. Layer 4 - Dependency Versions (incl. §4.6 Tauri Desktop)
 
 ---
 
-# PRD Supplement: Layer 1 — UI/UX Specification
+# PRD Supplement: Layer 1 - UI/UX Specification
 
 *Informed by competitive analysis of FlowJo, FCS Express, Kaluza, OMIQ, and open-source ecosystems.
 All user requirements incorporated: dashboard-centric layout, real-time job progress panel,
@@ -55,13 +55,13 @@ hover tooltips + click-to-drill-down, and collapsible beginner tutorial sidebar.
 **Top navigation bar** (48px fixed height, dark background):
 - Left: application logo + name
 - Center: current session name (editable inline on double-click)
-- Right: pipeline step indicator (5 dots: QC → Transform → Batch → Cluster → Analyze) — filled dot = complete, pulsing dot = in progress, empty dot = not started
+- Right: pipeline step indicator (5 dots: QC → Transform → Batch → Cluster → Analyze) - filled dot = complete, pulsing dot = in progress, empty dot = not started
 
 **Tutorial sidebar button**:
 - Fixed position: bottom-left corner, 40×40px circular button
 - Icon: lightbulb (💡); changes to ✕ when panel is open
 - On click: slides in a 320px panel from the left edge, overlaying (not pushing) page content
-- Tutorial panel content: context-aware — shows guidance relevant to the current page (e.g., on the Gate Editor page, shows "How to draw a polygon gate")
+- Tutorial panel content: context-aware - shows guidance relevant to the current page (e.g., on the Gate Editor page, shows "How to draw a polygon gate")
 - Panel has sections: Quick Start / Current Step Guide / Glossary / Video Links (placeholder)
 
 ---
@@ -77,11 +77,11 @@ hover tooltips + click-to-drill-down, and collapsible beginner tutorial sidebar.
 /sessions/:id/export      → Export
 ```
 
-No navigation bar between pages — users return via breadcrumb in top nav or "Back to Dashboard" button.
+No navigation bar between pages - users return via breadcrumb in top nav or "Back to Dashboard" button.
 
 ---
 
-## 1.3 Home Page — Session List
+## 1.3 Home Page - Session List
 
 **Layout**: centered card grid, max 3 columns.
 
@@ -98,7 +98,7 @@ Each session card (280×160px) shows:
 
 ---
 
-## 1.4 Session Dashboard — Primary Screen
+## 1.4 Session Dashboard - Primary Screen
 
 ### Overall Layout Philosophy
 The dashboard is **radial-from-center**: the most important visualization occupies the center panel; all supporting information panels surround it. Clicking any panel navigates to a full-screen detail view.
@@ -119,7 +119,7 @@ The dashboard is **radial-from-center**: the most important visualization occupi
 └──────────────┴─────────────────────────────┴───────────────────────┘
 ```
 
-### Center Panel — Primary Visualization
+### Center Panel - Primary Visualization
 **Content** (changes based on pipeline stage):
 - Before clustering: UMAP placeholder with message "Run clustering to see cell populations"
 - After clustering: UMAP scatter plot colored by metacluster, rendered with WebGL (supports 1M+ events at 60fps)
@@ -133,7 +133,7 @@ The dashboard is **radial-from-center**: the most important visualization occupi
 
 **Click panel header** → navigates to Gate Editor full-screen page.
 
-### Left Panel — File List
+### Left Panel - File List
 **Dimensions**: 240px wide, full height of panel row.
 
 **Content**: scrollable list of uploaded FCS files, one row per file.
@@ -152,7 +152,7 @@ Each row shows:
 
 **Click panel header "Files"** → stays on dashboard (no drill-down; file management is inline).
 
-### Right Panel — Population Tree
+### Right Panel - Population Tree
 **Dimensions**: 260px wide.
 
 **Content**: collapsible tree of named cell populations.
@@ -176,7 +176,7 @@ Each node row shows:
 
 **Panel header "Populations"** → click navigates to Gate Editor.
 
-### Bottom-Center Panel — Job Progress
+### Bottom-Center Panel - Job Progress
 **Dimensions**: full center column width, 140px height.
 
 **Content**: displays current and recent jobs.
@@ -203,7 +203,7 @@ If no job is running:
 
 **Hover panel** → no tooltip (progress is self-explanatory). **Click panel** → expands to show full job history log (last 10 jobs, each with timestamp and outcome).
 
-### Bottom-Left Panel — QC Summary
+### Bottom-Left Panel - QC Summary
 **Dimensions**: 240px wide, 140px height.
 
 **Content** (before QC): "QC not yet run. Click to configure and run."
@@ -225,7 +225,7 @@ If no job is running:
 
 **Click panel** → navigates to `/sessions/:id/qc` (QC Detail page).
 
-### Bottom-Right Panel — Quick Stats
+### Bottom-Right Panel - Quick Stats
 **Dimensions**: 260px wide, 140px height.
 
 **Content**: 4 stats displayed as large numbers with labels:
@@ -245,7 +245,7 @@ If no job is running:
 
 ---
 
-## 1.5 QC Detail Page — `/sessions/:id/qc`
+## 1.5 QC Detail Page - `/sessions/:id/qc`
 
 **Layout**: two-column.
 
@@ -267,7 +267,7 @@ Click a row → right column updates to show that file's QC visualization.
 
 ---
 
-## 1.6 Gate Editor — `/sessions/:id/gate-editor`
+## 1.6 Gate Editor - `/sessions/:id/gate-editor`
 
 **Layout**: full-screen, two-panel.
 
@@ -291,7 +291,7 @@ Click a row → right column updates to show that file's QC visualization.
   - Ellipse tool: click-drag from center
   - Selection tool: click existing gate to select/resize/move
   - Eraser: delete selected gate
-- While drawing: live event count shown in top-right corner of canvas ("12,400 events inside gate — 23.5% of parent")
+- While drawing: live event count shown in top-right corner of canvas ("12,400 events inside gate - 23.5% of parent")
 - Undo/redo: Cmd+Z / Cmd+Shift+Z; up to 20 steps
 - Color scale legend (bottom-right): shows current color mapping
 
@@ -305,13 +305,13 @@ Click a row → right column updates to show that file's QC visualization.
 
 ---
 
-## 1.7 Differential Analysis Results Page — `/sessions/:id/diff`
+## 1.7 Differential Analysis Results Page - `/sessions/:id/diff`
 
 **Layout**: tab-based, two tabs: "Differential Abundance (DA)" and "Differential State (DS)".
 
 **DA tab**:
 - Top: volcano plot (X = log fold change, Y = -log10 adjusted p-value); significant populations highlighted in red; hover point → tooltip with population name, LFC, p-adj
-- Bottom: sortable table (population name, cell count per group, LFC, p-value, p-adj, significant ✓/—)
+- Bottom: sortable table (population name, cell count per group, LFC, p-value, p-adj, significant ✓/-)
 - Table row hover → highlights corresponding point on volcano plot
 
 **DS tab**:
@@ -322,7 +322,7 @@ Click a row → right column updates to show that file's QC visualization.
 
 ---
 
-## 1.8 Export Page — `/sessions/:id/export`
+## 1.8 Export Page - `/sessions/:id/export`
 
 **Layout**: single-column, centered (max 640px width).
 
@@ -347,7 +347,7 @@ On completion: "Download Bundle (.zip)" button appears.
 
 ---
 
-## 1.9 Interaction Patterns — Global Rules
+## 1.9 Interaction Patterns - Global Rules
 
 ### Hover Tooltip Standard
 - **Trigger**: 400ms hover delay (prevents tooltip flicker during mouse movement)
@@ -362,7 +362,7 @@ On completion: "Download Bundle (.zip)" button appears.
 - Current page breadcrumb shown in top nav: "Session Dashboard > QC Detail"
 
 ### Loading States
-- Skeleton screens (grey animated shimmer) for panels waiting on data — never blank white
+- Skeleton screens (grey animated shimmer) for panels waiting on data - never blank white
 - Job progress panel is the single source of truth for async task state; no other spinners
 
 ### Error States
@@ -416,7 +416,7 @@ Below 900px: show "Viewport too narrow" banner (flow cytometry analysis is not a
 
 ---
 
-# PRD Supplement: Layer 2 — API & Data Model Specification
+# PRD Supplement: Layer 2 - API & Data Model Specification
 
 *Architecture decisions: single-user, polling-based job status, single Celery queue, data sharing via export bundle.*
 
@@ -723,8 +723,8 @@ bundle_<session_id>_<date>/
   ├── processed_fcs/            # post-QC, post-transform files
   ├── panel.csv
   ├── qc_report.html
-  ├── gating_strategy.xml       # GatingML 2.0 — machine-readable, open standard
-  ├── gating_strategy.wsp          # FlowJo workspace — opens directly in FlowJo
+  ├── gating_strategy.xml       # GatingML 2.0 - machine-readable, open standard
+  ├── gating_strategy.wsp          # FlowJo workspace - opens directly in FlowJo
   ├── clustering/
   │   ├── flowsom_model.rds
   │   ├── populations.csv       # name, cell_count, percentage, median_expression
@@ -1178,7 +1178,7 @@ All R-backed computations (PeacoQC, CytoNorm, FlowSOM, openCyto, diffcyt) use a
   │   ├── events.parquet        # transformed, QC-filtered event matrix (cells × channels)
   │   ├── params.json           # algorithm parameters (Layer 3 defaults + user overrides)
   │   ├── metadata.json         # panel, sample info, file list
-  │   └── (additional per-job inputs — see table below)
+  │   └── (additional per-job inputs - see table below)
   ├── output/                   # R writes here; Python reads after completion
   │   ├── result.parquet        # primary output data
   │   ├── result_metadata.json  # summary stats + completion signal
@@ -1290,7 +1290,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 | W | 0.5 | Linearization width near zero | flowCore default; Parks et al. 2006 |
 | A | 0 | Additional negative range in decades | Moore & Parks 2012 default |
 
-> **Note**: W is the most important tuning parameter — increase it when heavy compensation produces many negative events. flowCore's `estimateLogicle()` can auto-estimate the optimal W from data.
+> **Note**: W is the most important tuning parameter - increase it when heavy compensation produces many negative events. flowCore's `estimateLogicle()` can auto-estimate the optimal W from data.
 
 #### Arcsinh Transform (default for mass cytometry / CyTOF)
 | Parameter | Default | Description | Source |
@@ -1302,7 +1302,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 
 ---
 
-### 3.2 Quality Control — PeacoQC Parameters
+### 3.2 Quality Control - PeacoQC Parameters
 
 **Source**: Emmaneel et al. 2021, *Cytometry A*, PMID:34549881 (full text extracted directly)
 
@@ -1312,7 +1312,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 | `MAD` | **6** | Median absolute deviation multiplier; detects single-channel signal drift | Lower → stricter |
 | `consecutive_bins` | **5** | Minimum retained bins between removed regions; prevents isolated small segments from being kept | Higher → stricter |
 | `min_cells` | **150** | Minimum cell count per bin | Reduce for small samples |
-| `max_bins` | **500** | Maximum number of bins | — |
+| `max_bins` | **500** | Maximum number of bins | - |
 | `remove_zeros` | FALSE (flow) / TRUE (mass cytometry) | Whether to remove zero values before bin evaluation | Must be TRUE for mass cytometry data |
 
 **Warning thresholds** (logged to QC report automatically; sample is not deleted):
@@ -1324,7 +1324,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 
 ---
 
-### 3.3 Batch Correction — CytoNorm Parameters
+### 3.3 Batch Correction - CytoNorm Parameters
 
 **Source**: Van Gassen et al. 2019, *Cytometry A*, PMID:31633883 (full text extracted directly)
 
@@ -1344,12 +1344,12 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 
 **Key constraints** (must be surfaced in UI):
 - Reference samples must span the **complete expression range** of the target samples (paper Fig. 7: insufficient training coverage causes incorrect normalization)
-- Recommended: use **two reference samples** — one for training, one for blind validation
+- Recommended: use **two reference samples** - one for training, one for blind validation
 - Validation metric: Earth Mover's Distance (EMD); mean EMD reduction after correction ≈ 61% (±39%)
 
 ---
 
-### 3.4 Clustering — FlowSOM Parameters
+### 3.4 Clustering - FlowSOM Parameters
 
 **Source**: FlowSOM Bioconductor official documentation v2.20.0 (2026-03-17) + Python FlowSOM docs
 
@@ -1360,7 +1360,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 | `nClus` | **10** | Metacluster count (final cell population count) | User-specified; UI should offer presets: 5 / 10 / 15 / 20 / 25 |
 | `rlen` | **10** (default) | SOM training iterations; larger = more stable but slower | 100–140 recommended for CyTOF data (Frontiers Immunol 2024) |
 | `seed` | Must be set explicitly | Ensures reproducibility | Fix at 42 or make user-configurable |
-| `transformFunction` | `logicleTransform()` | Built-in transform; set to NULL if data already pre-processed | — |
+| `transformFunction` | `logicleTransform()` | Built-in transform; set to NULL if data already pre-processed | - |
 
 **Metacluster count selection logic** (write into UI tooltip):
 1. If user does not specify, run `nClus=10` for a fast initial result
@@ -1369,7 +1369,7 @@ sharing mechanism, file-based IPC for Python↔R subprocess boundary*
 
 ---
 
-### 3.5 Differential Testing — diffcyt Parameters
+### 3.5 Differential Testing - diffcyt Parameters
 
 **Source**: diffcyt Bioconductor documentation v1.28.0
 
@@ -1401,7 +1401,7 @@ Paired samples or repeated measurements?
 
 ---
 
-### 3.6 Hierarchical Gating — OpenCyto Algorithm Parameters
+### 3.6 Hierarchical Gating - OpenCyto Algorithm Parameters
 
 **Source**: openCyto Bioconductor documentation v2.14+ and flowDensity vignette
 
@@ -1435,17 +1435,17 @@ quadrant gates decompose into 4 child populations.
 | Package | Version | Purpose | Source |
 |---------|---------|---------|--------|
 | `flowkit` | **1.3.2** (current latest) | FCS read/write, GatingML 2.0, FlowJo .wsp parsing | PyPI (released late 2025; NumPy 2+ support added in 1.3.0) |
-| `fastapi` | ≥ 0.111 | REST API backend framework | — |
-| `uvicorn` | ≥ 0.30 | ASGI server | — |
-| `celery` | ≥ 5.3 | Async task queue for long-running jobs | — |
-| `redis` | ≥ 5.0 | Celery broker | — |
+| `fastapi` | ≥ 0.111 | REST API backend framework | - |
+| `uvicorn` | ≥ 0.30 | ASGI server | - |
+| `celery` | ≥ 5.3 | Async task queue for long-running jobs | - |
+| `redis` | ≥ 5.0 | Celery broker | - |
 | `numpy` | ≥ 2.0 | Numerical computing | FlowKit 1.3.x supports NumPy 2 |
-| `pandas` | ≥ 2.0 | Tabular data processing | — |
+| `pandas` | ≥ 2.0 | Tabular data processing | - |
 | `scipy` | ≤ 1.16.0 | Statistical computing (upper bound due to statsmodels constraint) | scanpy release notes |
-| `umap-learn` | ≥ 0.5 | UMAP dimensionality reduction for visualization | — |
+| `umap-learn` | ≥ 0.5 | UMAP dimensionality reduction for visualization | - |
 | `anndata` | ≥ 0.10 | Single-cell data structure (interoperable with FlowKit) | FlowKit docs recommendation |
-| `sqlalchemy` | ≥ 2.0 | Provenance database ORM | — |
-| `pydantic` | ≥ 2.0 | API data validation | — |
+| `sqlalchemy` | ≥ 2.0 | Provenance database ORM | - |
+| `pydantic` | ≥ 2.0 | API data validation | - |
 | `pyarrow` | ≥ 14.0 | Feather/Parquet export | FlowKit 1.3.x new dependency |
 
 **Notes**:
@@ -1544,7 +1544,7 @@ R_LIBS_USER:               /usr/local/lib/R/library
 *Document version: 2025-07 | Layer 3 parameter sources: PeacoQC full text (PMID:34549881), CytoNorm full text (PMID:31633883), diffcyt official docs (Bioc v1.28.0), FlowSOM official docs (v2.20.0), logicle transform original specification (Moore & Parks 2012) | Layer 4 version sources: PyPI, Bioconductor release pages, queried July 2025*
 ---
 
-### 4.6 Alternative Deployment: Desktop App (Tauri) — Phase 3
+### 4.6 Alternative Deployment: Desktop App (Tauri) - Phase 3
 
 *Addresses the proposal's "one-click/one-command deployment" goal for single-scientist
 use; no Docker required.*
@@ -1570,7 +1570,7 @@ User experience:
 | R environment | Bundled in container | Portable renv snapshot |
 | Update path | `docker compose pull` | Tauri auto-updater |
 
-**Backend code sharing**: 100% identical — only the shell/packaging layer differs.
+**Backend code sharing**: 100% identical - only the shell/packaging layer differs.
 
 **R bundling**: ship portable R binary (Rtools portable on Windows; R.app framework on
 macOS) + pre-built `renv` library snapshot. R subprocess path set to bundled binary at runtime.

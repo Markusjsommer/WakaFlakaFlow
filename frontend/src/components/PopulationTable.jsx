@@ -97,10 +97,10 @@ export default function PopulationTable({ populations = [], onPatch, onHover, on
                 </td>
                 <td style={tdNum}>{pop.metacluster_id}</td>
                 <td style={tdNum}>{Number(pop.cell_count).toLocaleString()}</td>
-                <td style={tdNum}>{Number.isFinite(pct) ? pct.toFixed(1) : '—'}</td>
+                <td style={tdNum}>{Number.isFinite(pct) ? pct.toFixed(1) : '-'}</td>
                 <td style={td}>
                   {tops.length === 0 ? (
-                    <span style={{ color: 'var(--muted)' }}>—</span>
+                    <span style={{ color: 'var(--muted)' }}>-</span>
                   ) : (
                     <span style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                       {tops.map(([marker, value]) => (

@@ -31,10 +31,10 @@ the flowSpecs package if used in a publication.
 
 | File | Events × channels | Role |
 |------|-------------------|------|
-| `PBMC_spectral_MIXED_raw.fcs` | 8,000 × 47 | **Mixed** — raw detector signal (V1–V16, B1–B16, R1–R10 + scatter). Instrument export *before* unmixing. Input to the v2 "unmix in app" path. |
-| `PBMC_spectral_UNMIXED.fcs` | 8,000 × 18 | **Unmixed** — per-marker abundances (CD3, CD4, …) + scatter. Input to the v1 "analysis only" path. |
+| `PBMC_spectral_MIXED_raw.fcs` | 8,000 × 47 | **Mixed** - raw detector signal (V1–V16, B1–B16, R1–R10 + scatter). Instrument export *before* unmixing. Input to the v2 "unmix in app" path. |
+| `PBMC_spectral_UNMIXED.fcs` | 8,000 × 18 | **Unmixed** - per-marker abundances (CD3, CD4, …) + scatter. Input to the v1 "analysis only" path. |
 | `single_stain_controls/*.fcs` | 500 × 47 (×15) | Single-stain bead + cell controls. Reference spectra needed to build the unmixing matrix. |
-| `QC_biology_check.png` | — | QC figure: scatter cleanup, CD3/CD19 lineage split, CD4/CD8 T-cell split. |
+| `QC_biology_check.png` | - | QC figure: scatter cleanup, CD3/CD19 lineage split, CD4/CD8 T-cell split. |
 
 ## How the unmixed file was produced
 
@@ -47,7 +47,7 @@ vendor unmixer, so the mixed→unmixed relationship is fully reproducible:
    **spectral signature** per fluorophore.
 2. Add an autofluorescence endmember from the unstained PBMC control.
 3. Stack the 13 signatures into a 42 × 13 spectrum matrix **S** and solve the
-   per-event linear unmixing `A = X · pinv(S)ᵀ` (ordinary least squares — the
+   per-event linear unmixing `A = X · pinv(S)ᵀ` (ordinary least squares - the
    transparent form of the weighted-least-squares approach Cytek uses).
 
 **Validity check.** In the unmixed data, CD3 (T cells) and CD19 (B cells) are
@@ -67,9 +67,9 @@ lasers.
 
 ## Note on network access
 
-An alternative candidate — FlowRepository **FR-FCM-Z2QV** (titled "40 color OMIP
+An alternative candidate - FlowRepository **FR-FCM-Z2QV** (titled "40 color OMIP
 new donors unmixed", primary researcher Joanne Lannigan, per the FlowRepository
-experiment page) — was identified but requires a FlowRepository login to
+experiment page) - was identified but requires a FlowRepository login to
 download and the site is
 currently rate-limiting downloads, so it was not used. FlowRepository's TLS
 certificate is also expired (a known server-side issue). The flowSpecs data

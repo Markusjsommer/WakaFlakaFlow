@@ -1,4 +1,4 @@
-# WakaFlakaFlow — one-command run.
+# WakaFlakaFlow - one-command run.
 #
 #   git clone <repo> && cd <repo>
 #   mkdir -p fcs && cp /path/to/your/*.fcs ./fcs/   # drop your FCS files here
@@ -19,7 +19,7 @@ services:
     volumes:
       # Persisted runtime state: SQLite provenance DB, exports, uploads.
       - ./data:/app/data
-      # Drop your own .fcs files into ./fcs — they are auto-registered on startup
+      # Drop your own .fcs files into ./fcs - they are auto-registered on startup
       # (read-only mount; the tool never modifies your source files).
       - ./fcs:/app/fcs:ro
     environment:
