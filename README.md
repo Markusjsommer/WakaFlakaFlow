@@ -1,131 +1,188 @@
-# WakaFlakaFlow — Automated Cell Population Identification
+# WakaFlakaFlow — a no-code tool for automated spectral flow cytometry analysis
 
-A no-code, self-hosted flow-cytometry tool. Point it at an FCS file and it
-transforms the data, runs **FlowSOM** clustering with a **UMAP** embedding, and
-returns **named cell populations** with counts, percentages, and median-marker
-tables — then lets you rename populations and export a reproducibility bundle.
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Runs locally](https://img.shields.io/badge/data-stays%20local-brightgreen.svg)](#privacy)
 
-This is a real analysis tool, not a demo. It runs entirely on your own machine.
-`git clone` → `docker compose up` → open a browser → analyze your FCS files.
+WakaFlakaFlow takes a spectral flow cytometry FCS file and, without any coding,
+produces named cell populations with counts, frequencies, and marker profiles.
+It runs a complete post-acquisition workflow — spectral unmixing, quality
+control and transformation, automated population identification (FlowSOM +
+UMAP), and cross-sample batch correction — behind a browser interface, and
+exports a reproducibility bundle for every run.
 
----
+> WakaFlakaFlow is a **post-acquisition analysis** tool. It reads the standard
+> FCS files your instrument already exports (Cytek Aurora, Sony ID7000, BD
+> FACSymphony, and any other ISAC-compliant device). It does not control the
+> cytometer, and it does not sort cells — it analyzes what the instrument
+> produced.
 
-## Quick start (one command)
+> The tool is **self-hosted**: the application, the analysis engines, and the
+> database all run in a container on your own machine. No FCS file, population,
+> or result is ever uploaded. See [Privacy](#privacy).
 
-You need [Docker](https://docs.docker.com/get-docker/) with Compose v2.
+WakaFlakaFlow orchestrates established, peer-reviewed cytometry engines rather
+than reimplementing them. It is designed to slot into an existing workflow — it
+reads standard FCS and can round-trip gating definitions with FlowJo — rather
+than to replace the tools a lab already uses.
 
-```bash
-git clone <this-repo-url> wakaflakaflow
-cd wakaflakaflow
+## What it does
 
-# Put your FCS files where the tool can see them:
-mkdir -p fcs
-cp /path/to/your/*.fcs ./fcs/
+WakaFlakaFlow covers the post-acquisition workflow in stages, each usable on its
+own:
 
-# Build and run (first build downloads deps; subsequent runs are instant):
-docker compose up --build
-```
+* **Spectral unmixing** — resolves raw multi-detector signal into
+  per-fluorophore channels using single-stain controls, for instruments or
+  experiments where only raw (mixed) FCS is available.
+* **Quality control and transformation** — arcsinh transformation with a
+  per-channel cofactor; scatter and time channels are held out of clustering by
+  default.
+* **Automated population identification** — FlowSOM self-organizing-map
+  clustering with metaclustering, paired with a UMAP embedding for
+  visualization. Populations are returned with cell counts, frequencies, and
+  per-population median-marker tables, and can be renamed interactively.
+* **Batch correction** — cross-acquisition normalization (CytoNorm, with a
+  ComBat fallback) so samples run on different days or instruments are
+  comparable.
+* **Reproducibility export** — every run produces a `.zip` bundle with the
+  population table, UMAP coordinates, the marker panel, run parameters, and
+  engine versions.
 
-Then open **<http://localhost:8000>**.
+## Installation
 
-Any `*.fcs` file you drop into `./fcs/` is auto-registered on startup and appears
-in the file selector. Your source files are mounted read-only and are never
-modified. Runtime state (SQLite provenance DB, exports) lands in `./data/`.
+WakaFlakaFlow ships as a Docker image and runs with a single command. The only
+prerequisite is [Docker](https://docs.docker.com/get-docker/) with Compose v2.
 
-No FCS files present yet? Use the **Load demo** button in the UI to run the exact
-same pipeline on locally-available sample data.
+    git clone https://github.com/Markusjsommer/WakaFlakaFlow.git
+    cd WakaFlakaFlow
+    docker compose up --build
 
----
+The first build downloads dependencies; subsequent starts are immediate. When
+the container is running, open <http://localhost:8000>.
 
-## The workflow
+> The build bundles a small permissively-licensed demo dataset, so the tool is
+> usable immediately with no data of your own — click **Load demo** in the
+> interface. See [Data](#bundled-data).
 
-1. **Pick a file** (or *Load demo*).
-2. **Choose your marker panel** — a checkbox list built from the file's channels.
-   Scatter (FSC/SSC) and Time are excluded from clustering by default;
-   fluorophore markers are pre-checked. Use *all / none* to toggle quickly.
-3. **Pick a metacluster count** — preset buttons for 5 / 10 / 15 / 20 / 25
-   (default 10).
-4. **Run.** The backend arcsinh-transforms the events, runs FlowSOM
-   (self-organizing map + metaclustering), and computes a UMAP embedding.
-   Progress streams into a progress bar (Loading → Clustering → UMAP → Done).
-5. **Explore the results:**
-   - a **UMAP scatter** colored by population, with a population legend;
-   - a **population table** — color swatch, editable name, metacluster id, cell
-     count, percentage of total, and the top median markers per population.
-     Rename a population inline; hover a row to highlight its cells on the UMAP.
-6. **Export results (.zip)** — a reproducibility bundle containing
-   `populations.csv`, `umap_coordinates.csv`, `panel.csv`, a `session_info.txt`
-   with tool + engine versions and run parameters, and a provenance README.
+## Usage
 
----
+### Analyzing your own files
+
+Place `*.fcs` files in a `fcs/` directory before starting the container; they
+are registered on startup and appear in the file selector.
+
+    mkdir -p fcs
+    cp /path/to/your/*.fcs ./fcs/
+    docker compose up
+
+The `fcs/` directory is mounted read-only — source files are never modified.
+Runtime state (the SQLite provenance database and exports) is written to
+`data/`.
+
+### Identifying populations
+
+1. Select a file, or click **Load demo**.
+2. Choose the marker panel. The panel is built from the file's channels;
+   fluorophore markers are pre-selected and scatter/time channels are excluded
+   from clustering by default.
+3. Choose a metacluster count (default 10).
+4. Run. The backend transforms the events, runs FlowSOM, and computes a UMAP
+   embedding, streaming progress through the interface.
+5. Inspect results: a UMAP scatter colored by population, and a population table
+   with counts, frequencies, and top median markers. Rename populations inline;
+   hovering a table row highlights that population on the embedding.
+6. Export the reproducibility bundle (`.zip`).
+
+### Spectral unmixing
+
+For raw (mixed) FCS, provide single-stain control files and start an unmixing
+job; the unmixed per-marker output feeds directly into population
+identification.
+
+### Batch correction
+
+To compare acquisitions across batches, run batch correction over a set of
+files before clustering. CytoNorm is used by default, with ComBat as a fallback.
 
 ## Privacy
 
-**No data is uploaded anywhere.** The application, the analysis engines, and the
-database all run inside your local container. Your FCS files, the derived
-populations, and every export stay on your machine. There is no telemetry, no
-account, and no outbound network call during analysis.
+WakaFlakaFlow performs no outbound network calls during analysis. There is no
+telemetry, no account, and no upload step. FCS files, derived populations, and
+exports remain on the machine running the container.
 
----
+## Bundled data
 
-## Local development
+The repository includes a small, permissively-licensed demo dataset —
+**flowSpecs** example spectral data (Artistic-2.0), exported to FCS under
+`sample_data/spectral_pbmc/` — which powers the **Load demo** button. See
+[`NOTICE.md`](NOTICE.md) for details and provenance.
 
-Prefer running the pieces directly? You need Python 3.12+ and Node 20+.
+The 40-color reference acquisition used during development ("phitonex E1") is
+licensed CC BY-ND and is therefore **not** redistributed with this project; it
+is git-ignored. Bring your own FCS files to analyze data at that scale.
 
-**Backend** — FastAPI + SQLite, served on port **8001**:
+## Development
 
-```bash
-python3 -m venv .venv
-./.venv/bin/pip install -r backend/requirements.txt
-./.venv/bin/python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8001
-```
+Running the components directly (outside Docker) requires Python 3.12+ and
+Node 20+.
 
-**Frontend** — Vite dev server on port **5173**, proxying `/api` → `:8001`:
+**Backend** (FastAPI + SQLite, port 8001):
 
-```bash
-npm --prefix frontend install
-npm --prefix frontend run dev
-```
+    python3 -m venv .venv
+    ./.venv/bin/pip install -r backend/requirements.txt
+    ./.venv/bin/python -m uvicorn main:app --app-dir backend --host 127.0.0.1 --port 8001
 
-Open <http://localhost:5173>. In the Docker image the SPA is pre-built and served
-by the backend itself, so production runs on a single port (**8000**).
+**Frontend** (Vite dev server, port 5173, proxying `/api` to the backend):
 
-To register FCS files in dev, set `WAKAFLAKA_FCS_DIR` to a directory of `*.fcs`
-before launching uvicorn (they are registered on the default session at startup).
+    npm --prefix frontend install
+    npm --prefix frontend run dev
 
----
+Then open <http://localhost:5173>. In the Docker image the frontend is
+pre-built and served by the backend process, so a production deployment uses a
+single port (8000). Set `WAKAFLAKA_FCS_DIR` to a directory of `*.fcs` files to
+register them at startup during development.
+
+The REST API is served under `/api/v1`; interactive documentation is available
+at `/docs` (FastAPI/OpenAPI) when the backend is running.
 
 ## Architecture
 
-```
-Browser (React + Plotly)
-        │  /api/v1  (same origin in Docker; proxied in dev)
-        ▼
-FastAPI + SQLite ── ThreadPoolExecutor
-        │  FlowKit (FCS I/O + arcsinh)
-        │  FlowSOM (clustering + metaclustering)
-        │  umap-learn (2-D embedding)
-        ▼
-Named populations · median-marker tables · reproducibility export (.zip)
-```
+    Browser (React + Plotly)
+            │  /api/v1
+            ▼
+    FastAPI + SQLite  ──  background job workers
+            │  FlowKit         FCS I/O, arcsinh transform
+            │  FlowSOM         SOM clustering + metaclustering
+            │  umap-learn      2-D embedding
+            │  CytoNorm / R    batch correction (R engines via subprocess)
+            ▼
+    Named populations · marker tables · reproducibility export (.zip)
 
-The Docker image is a single stage-built artifact: the Vite frontend is compiled
-to static assets and served by the same FastAPI process that exposes the API.
+The Python core and the R-based engines run as separate processes; the frontend
+is compiled to static assets and served by the same FastAPI process in the
+Docker image.
 
----
+## Acknowledgments
+
+WakaFlakaFlow orchestrates several established libraries, each retaining its own
+license and copyright. If you use WakaFlakaFlow in published work, please cite
+the underlying engines you rely on:
+
+* **FlowKit** — FCS I/O and transforms (White et al., *Front. Immunol.* 2021)
+* **FlowSOM** — clustering and metaclustering (Van Gassen et al., *Cytometry A*
+  2015)
+* **UMAP** — dimensionality reduction (McInnes et al., 2018)
+* **CytoNorm** — batch normalization (Van Gassen et al., *Cytometry A* 2020)
+* **flowCore / openCyto** — R data structures and gating (Hahne et al. 2009;
+  Finak et al. 2014)
+
+See [`NOTICE.md`](NOTICE.md) for the complete list of wrapped engines and their
+licenses.
 
 ## License
 
 WakaFlakaFlow is licensed under the **GNU Affero General Public License v3.0**
-(AGPL-3.0-or-later). See [`LICENSE`](LICENSE) for the full text and
-[`NOTICE.md`](NOTICE.md) for the wrapped engines and their individual licenses.
-
-If you run a modified version of this software as a network service, the AGPL
-requires you to offer the corresponding source of your modified version to that
-service's users.
-
-### A note on bundled data
-
-The 40-color reference acquisition used during development (phitonex "E1") is
-**CC BY-ND** and is therefore **not redistributed** with this project — it is
-git-ignored and kept local. Bring your own FCS files; see *Quick start* above.
+(AGPL-3.0-or-later); see [`LICENSE`](LICENSE). If you run a modified version as a
+network service, the AGPL requires you to offer the corresponding source of your
+modified version to that service's users. The wrapped analysis engines remain
+under their own licenses, listed in [`NOTICE.md`](NOTICE.md).
