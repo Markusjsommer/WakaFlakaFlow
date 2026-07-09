@@ -237,38 +237,43 @@ export default function App() {
 
   return (
     <div className="app">
-      <main className="app__body">
-        <header className="app__header">
-          <h1>WakaFlakaFlow — Automated Cell Population Identification</h1>
-          <p className="app__sub">
-            Point at an FCS file, transform, and let FlowSOM cluster and UMAP-embed the
-            cells into named populations with counts, percentages and median-marker
-            profiles. Everything runs locally — no data leaves your machine.
-          </p>
+      <header className="site-header">
+        <div className="site-header__inner">
+          <div className="wordmark">
+            <span className="wordmark__mark" aria-hidden="true" />
+            <span className="wordmark__name">WakaFlakaFlow</span>
+            <span className="wordmark__tag">Spectral cytometry analysis</span>
+          </div>
           {sessionId && (
-            <p className="app__meta">
-              Session <code>{sessionId}</code>
+            <div className="site-header__meta">
               {channels.length > 0 && (
-                <>
-                  {' · '}
-                  {channels.length} channels
-                  {' · '}
+                <span>
+                  {channels.length} channels ·{' '}
                   {channels.filter((c) => !c.is_scatter).length} markers
-                </>
+                </span>
               )}
-            </p>
+              <code title={sessionId}>session {String(sessionId).slice(0, 8)}</code>
+            </div>
           )}
-        </header>
+        </div>
+      </header>
 
-        {/* Mode switch: keep the existing flow under the first tab, add the
-            v2 unmixing path under the second. */}
-        <div
-          className="engine-toggle"
-          style={{ display: 'flex', margin: '16px 0 0', flexWrap: 'wrap' }}
-        >
+      <main className="app__body">
+        <section className="page-intro">
+          <h1>Automated cell population identification</h1>
+          <p className="app__sub">
+            Point at a spectral flow cytometry FCS file — WakaFlakaFlow transforms the
+            events, clusters them with FlowSOM, embeds them with UMAP, and returns named
+            cell populations with counts, frequencies, and median-marker profiles.
+            Everything runs locally; no data leaves your machine.
+          </p>
+        </section>
+
+        {/* Workflow tabs: population ID (v1) and raw→unmix→analyze (v2). */}
+        <nav className="tabs" aria-label="Workflow">
           <button
             type="button"
-            className={'engine-toggle__btn' + (mode === 'analyze' ? ' is-active' : '')}
+            className={'tab' + (mode === 'analyze' ? ' is-active' : '')}
             onClick={() => setMode('analyze')}
             disabled={running || unmixRunning}
           >
@@ -276,13 +281,13 @@ export default function App() {
           </button>
           <button
             type="button"
-            className={'engine-toggle__btn' + (mode === 'unmix' ? ' is-active' : '')}
+            className={'tab' + (mode === 'unmix' ? ' is-active' : '')}
             onClick={() => setMode('unmix')}
             disabled={running || unmixRunning}
           >
             Unmix raw → analyze
           </button>
-        </div>
+        </nav>
 
         {mode === 'analyze' ? (
           <>
