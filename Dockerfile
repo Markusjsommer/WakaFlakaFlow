@@ -1,11 +1,11 @@
 # syntax=docker/dockerfile:1
 #
-# WakaFlakaFlow - single combined image: Python backend + R engines + built SPA.
+# WakaFlockaFlow - single combined image: Python backend + R engines + built SPA.
 # The React app is compiled to static assets and served by FastAPI, and the R
 # spectral engines (AutoSpectral unmixing; FlowSOM/flowWorkspace) run in-process
 # via Rscript. One `docker compose up`, one port, no external services.
 #
-#   docker build -t wakaflakaflow .
+#   docker build -t wakaflockaflow .
 #
 # NOTE: this is a large image (Bioconductor + AutoSpectral + scientific Python).
 # First build is long; subsequent builds are cached.
@@ -52,9 +52,9 @@ COPY backend/ /app/backend/
 COPY sample_data/ /app/sample_data/
 COPY --from=frontend /fe/dist /app/static
 
-ENV WAKAFLAKA_STATIC=/app/static \
-    WAKAFLAKA_R_MODE=local \
-    WAKAFLAKA_R_SCRIPTS=/app/backend/r_scripts
+ENV WAKAFLOCKA_STATIC=/app/static \
+    WAKAFLOCKA_R_MODE=local \
+    WAKAFLOCKA_R_SCRIPTS=/app/backend/r_scripts
 
 # REPO_ROOT = parent of backend/ = /app  ->  DATA_DIR=/app/data, DEMO_DIR=/app/sample_data/...
 WORKDIR /app/backend

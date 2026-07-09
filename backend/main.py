@@ -1,4 +1,4 @@
-"""FastAPI app for WakaFlakaFlow - automated cell-population identification.
+"""FastAPI app for WakaFlockaFlow - automated cell-population identification.
 
 Point at an FCS file -> arcsinh transform -> FlowSOM clustering + UMAP -> named cell
 populations with count/percentage/median-marker tables -> reproducibility export.
@@ -6,7 +6,7 @@ populations with count/percentage/median-marker tables -> reproducibility export
 All routes live under /api/v1. Long-running work (clustering, export) runs in the
 ThreadPoolExecutor in jobs.py; handlers return {"job_id"} immediately and the frontend
 polls GET /api/v1/jobs/{id} every 2s. In the packaged Docker image the built SPA is served
-by this same process (WAKAFLAKA_STATIC); in dev the Vite server proxies to it. The optional
+by this same process (WAKAFLOCKA_STATIC); in dev the Vite server proxies to it. The optional
 synthetic batch-correction routes remain as a pipeline self-test, not the product.
 """
 
@@ -175,9 +175,9 @@ def _bootstrap():
                 )
             db.commit()
 
-        # Register any *.fcs dropped into WAKAFLAKA_FCS_DIR (Docker bind-mount) as
+        # Register any *.fcs dropped into WAKAFLOCKA_FCS_DIR (Docker bind-mount) as
         # files of the default session, in addition to the bundled E1 acquisition.
-        fcs_dir = os.environ.get("WAKAFLAKA_FCS_DIR")
+        fcs_dir = os.environ.get("WAKAFLOCKA_FCS_DIR")
         if fcs_dir and os.path.isdir(fcs_dir):
             for entry in sorted(Path(fcs_dir).glob("*.fcs")):
                 fpath = str(entry.resolve())
@@ -211,7 +211,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="WakaFlakaFlow", lifespan=lifespan)
+app = FastAPI(title="WakaFlockaFlow", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -235,7 +235,7 @@ def create_session(payload: SessionCreate | None = None, db: SASession = Depends
 
 @router.get("/default-session")
 def default_session(db: SASession = Depends(get_db)):
-    """The bootstrap session that owns the bundled demo + WAKAFLAKA_FCS_DIR files.
+    """The bootstrap session that owns the bundled demo + WAKAFLOCKA_FCS_DIR files.
     The single-user UI reuses this so registered files show up on load."""
     sess = db.query(SessionModel).order_by(SessionModel.created_at.asc()).first()
     if sess is None:
@@ -421,7 +421,7 @@ def download_export(sid: str, bid: str, db: SASession = Depends(get_db)):
     return FileResponse(
         str(zip_path),
         media_type="application/zip",
-        filename=f"wakaflaka_export_{bid}.zip",
+        filename=f"wakaflocka_export_{bid}.zip",
     )
 
 
@@ -449,13 +449,13 @@ app.include_router(unmix_api.router)
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok", "service": "WakaFlakaFlow"}
+    return {"status": "ok", "service": "WakaFlockaFlow"}
 
 
 # Serve the built frontend SPA when a static bundle is provided (Docker: one port for
 # API + UI). Mounted AFTER all routers so /api/v1 still resolves; guarded by env so dev
 # (uvicorn + vite) is unaffected.
-_static_dir = os.environ.get("WAKAFLAKA_STATIC")
+_static_dir = os.environ.get("WAKAFLOCKA_STATIC")
 if _static_dir and os.path.isdir(_static_dir):
     from fastapi.staticfiles import StaticFiles
 

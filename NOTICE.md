@@ -1,10 +1,10 @@
 # NOTICE
 
-**WakaFlakaFlow** is free software licensed under the **GNU Affero General Public
+**WakaFlockaFlow** is free software licensed under the **GNU Affero General Public
 License, version 3.0 (AGPL-3.0-or-later)**. See [`LICENSE`](LICENSE) for the full
 license text.
 
-Copyright (C) 2026 The WakaFlakaFlow contributors.
+Copyright (C) 2026 The WakaFlockaFlow contributors.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
@@ -16,7 +16,7 @@ source of your modified version to the users of that service.
 
 ## Wrapped / third-party engines
 
-WakaFlakaFlow orchestrates several established flow-cytometry and machine-learning
+WakaFlockaFlow orchestrates several established flow-cytometry and machine-learning
 libraries. Each remains under its own license and copyright; they are dependencies,
 not part of this project's source. AGPL-3.0 is compatible with (and, where combined,
 governs the aggregate of) the components below.

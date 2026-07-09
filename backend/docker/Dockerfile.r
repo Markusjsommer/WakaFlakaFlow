@@ -1,8 +1,8 @@
 # CytoNorm-in-a-box. Built once; invoked per job via `docker run`.
 # Long pole of the 1-day build - build this FIRST, in the background.
 #
-#   docker build -f backend/docker/Dockerfile.r -t wakaflaka-r:cytonorm .
-#   docker run --rm wakaflaka-r:cytonorm Rscript -e 'library(CytoNorm); cat("ok\n")'
+#   docker build -f backend/docker/Dockerfile.r -t wakaflocka-r:cytonorm .
+#   docker run --rm wakaflocka-r:cytonorm Rscript -e 'library(CytoNorm); cat("ok\n")'
 #
 # Base is the official Bioconductor image (R 4.4 / Bioc 3.20): flowCore + FlowSOM
 # and their compiled deps are already prebuilt here, which is what saves the hour
@@ -25,6 +25,6 @@ RUN R -e 'library(flowCore); library(FlowSOM); library(CytoNorm); library(jsonli
           cat("R engine image OK\n")'
 
 # The job working dir is bind-mounted at run time:
-#   docker run --rm -v <abs job dir>:/job wakaflaka-r:cytonorm \
+#   docker run --rm -v <abs job dir>:/job wakaflocka-r:cytonorm \
 #     Rscript /job/run_cytonorm.R /job
 WORKDIR /job

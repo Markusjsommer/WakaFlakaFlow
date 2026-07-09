@@ -1,4 +1,4 @@
-# WakaFlakaFlow - Product Requirements Document
+# WakaFlockaFlow - Product Requirements Document
 
 *Integrated v2 - Layers 1–4 with Amendment A applied.*
 *Amendment A fixes: (1) FlowJo .wsp export in ExportBundle, (2) openCyto hierarchical*

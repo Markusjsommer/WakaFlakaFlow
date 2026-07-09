@@ -1,10 +1,10 @@
-# WakaFlakaFlow - a no-code tool for automated spectral flow cytometry analysis
+# WakaFlockaFlow - a no-code tool for automated spectral flow cytometry analysis
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Runs locally](https://img.shields.io/badge/data-stays%20local-brightgreen.svg)](#privacy)
 
-WakaFlakaFlow takes a spectral flow cytometry FCS file and, without any coding,
+WakaFlockaFlow takes a spectral flow cytometry FCS file and, without any coding,
 produces named cell populations with counts, frequencies, and marker profiles.
 It runs a post-acquisition workflow - spectral unmixing, transformation, and
 automated population identification with cell-type annotation (FlowSOM + UMAP) -
@@ -12,7 +12,7 @@ behind a browser interface, and exports a reproducibility bundle for every run.
 Cross-acquisition batch-correction engines (CytoNorm, ComBat) are included; a
 guided interface for them is on the roadmap.
 
-> WakaFlakaFlow is a **post-acquisition analysis** tool. It reads the standard
+> WakaFlockaFlow is a **post-acquisition analysis** tool. It reads the standard
 > FCS files your instrument already exports (Cytek Aurora, Sony ID7000, BD
 > FACSymphony, and any other ISAC-compliant device). It does not control the
 > cytometer, and it does not sort cells - it analyzes what the instrument
@@ -22,14 +22,14 @@ guided interface for them is on the roadmap.
 > database all run in a container on your own machine. No FCS file, population,
 > or result is ever uploaded. See [Privacy](#privacy).
 
-WakaFlakaFlow orchestrates established, peer-reviewed cytometry engines rather
+WakaFlockaFlow orchestrates established, peer-reviewed cytometry engines rather
 than reimplementing them. It is designed to slot into an existing workflow - it
 reads standard FCS and can round-trip gating definitions with FlowJo - rather
 than to replace the tools a lab already uses.
 
 ## What it does
 
-WakaFlakaFlow covers the post-acquisition workflow in stages, each usable on its
+WakaFlockaFlow covers the post-acquisition workflow in stages, each usable on its
 own:
 
 * **Spectral unmixing** - resolves raw multi-detector signal into
@@ -54,11 +54,11 @@ own:
 
 ## Installation
 
-WakaFlakaFlow ships as a Docker image and runs with a single command. The only
+WakaFlockaFlow ships as a Docker image and runs with a single command. The only
 prerequisite is [Docker](https://docs.docker.com/get-docker/) with Compose v2.
 
-    git clone https://github.com/Markusjsommer/WakaFlakaFlow.git
-    cd WakaFlakaFlow
+    git clone https://github.com/Markusjsommer/WakaFlockaFlow.git
+    cd WakaFlockaFlow
     docker compose up --build
 
 The first build downloads dependencies; subsequent starts are immediate. When
@@ -126,7 +126,7 @@ point-and-click stage.
 
 ## Privacy
 
-WakaFlakaFlow performs no outbound network calls during analysis. There is no
+WakaFlockaFlow performs no outbound network calls during analysis. There is no
 telemetry, no account, and no upload step. FCS files, derived populations, and
 exports remain on the machine running the container.
 
@@ -160,7 +160,7 @@ Node 20+.
 
 Then open <http://localhost:5173>. In the Docker image the frontend is
 pre-built and served by the backend process, so a production deployment uses a
-single port (8000). Set `WAKAFLAKA_FCS_DIR` to a directory of `*.fcs` files to
+single port (8000). Set `WAKAFLOCKA_FCS_DIR` to a directory of `*.fcs` files to
 register them at startup during development.
 
 The REST API is served under `/api/v1`; interactive documentation is available
@@ -185,8 +185,8 @@ Docker image.
 
 ## Acknowledgments
 
-WakaFlakaFlow orchestrates several established libraries, each retaining its own
-license and copyright. If you use WakaFlakaFlow in published work, please cite
+WakaFlockaFlow orchestrates several established libraries, each retaining its own
+license and copyright. If you use WakaFlockaFlow in published work, please cite
 the underlying engines you rely on:
 
 * **FlowKit** - FCS I/O and transforms (White et al., *Front. Immunol.* 2021)
@@ -202,7 +202,7 @@ licenses.
 
 ## License
 
-WakaFlakaFlow is licensed under the **GNU Affero General Public License v3.0**
+WakaFlockaFlow is licensed under the **GNU Affero General Public License v3.0**
 (AGPL-3.0-or-later); see [`LICENSE`](LICENSE). If you run a modified version as a
 network service, the AGPL requires you to offer the corresponding source of your
 modified version to that service's users. The wrapped analysis engines remain

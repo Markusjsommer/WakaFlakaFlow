@@ -1,6 +1,6 @@
-# WakaFlakaFlow - Prototype Engineering Plan (1-day)
+# WakaFlockaFlow - Prototype Engineering Plan (1-day)
 
-*Derived from `WakaFlakaFlow_PRD_v2.md`, `spectral_gating_proposal.md`,
+*Derived from `WakaFlockaFlow_PRD_v2.md`, `spectral_gating_proposal.md`,
 `gating_automation_landscape.md`, `DATASET_COMPARISON.md`.*
 
 **Locked decisions (2026-07-09):**
@@ -156,7 +156,7 @@ Present: Python 3.13.11, Node v25.9.0, Docker ✓, R ✗ (that's why R lives in 
 ## 5. Repo layout
 
 ```
-WakaFlakaFlow/
+WakaFlockaFlow/
 ├── backend/
 │   ├── main.py               # FastAPI + routes
 │   ├── db.py / models.py      # SQLite: Session, FCSFile, Job, BatchCorrectionRun

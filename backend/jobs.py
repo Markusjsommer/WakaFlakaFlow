@@ -1,4 +1,4 @@
-"""ThreadPoolExecutor pipeline glue for WakaFlakaFlow.
+"""ThreadPoolExecutor pipeline glue for WakaFlockaFlow.
 
 Owns the long-running work behind the REST layer:
   * submit_batch_correction -> synthetic drift injection -> CytoNorm/ComBat -> EMD -> UMAP

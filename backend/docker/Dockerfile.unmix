@@ -2,10 +2,10 @@
 # Extends the already-built CytoNorm image (flowCore + FlowSOM + remotes) with
 # flowWorkspace + AutoSpectral. Invoked via file-based IPC like run_cytonorm.R.
 #
-#   docker build -f backend/docker/Dockerfile.unmix -t wakaflaka-r:unmix backend
-#   docker run --rm wakaflaka-r:unmix Rscript -e 'library(AutoSpectral); cat("ok\n")'
+#   docker build -f backend/docker/Dockerfile.unmix -t wakaflocka-r:unmix backend
+#   docker run --rm wakaflocka-r:unmix Rscript -e 'library(AutoSpectral); cat("ok\n")'
 
-FROM wakaflaka-r:cytonorm
+FROM wakaflocka-r:cytonorm
 
 RUN R -e 'BiocManager::install(c("flowWorkspace"), update=FALSE, ask=FALSE)'
 RUN R -e 'remotes::install_github("DrCytometer/AutoSpectral", upgrade="never")'

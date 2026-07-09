@@ -16,7 +16,7 @@ from combat.pycombat import pycombat
 R_SCRIPT_SRC = "/Users/markus/_work/caveman_flow/backend/r_scripts/run_cytonorm.R"
 
 
-def run_cytonorm(jobdir: str, image: str = "wakaflaka-r:cytonorm",
+def run_cytonorm(jobdir: str, image: str = "wakaflocka-r:cytonorm",
                  timeout: int = 1800) -> str:
     """Run CytoNorm in Docker against ``jobdir`` and return the output dir.
 

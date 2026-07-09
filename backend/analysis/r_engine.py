@@ -2,8 +2,8 @@
 
 Works in BOTH deployment shapes with one entrypoint:
 
-  * dev            -> R lives in a per-recipe Docker image (WAKAFLAKA_R_MODE=docker)
-  * combined image -> R is on PATH next to the API (WAKAFLAKA_R_MODE=local)
+  * dev            -> R lives in a per-recipe Docker image (WAKAFLOCKA_R_MODE=docker)
+  * combined image -> R is on PATH next to the API (WAKAFLOCKA_R_MODE=local)
 
 All R recipes share the same file-based IPC contract as run_cytonorm.R / run_unmix.R:
     <jobdir>/input/...      - inputs staged by the caller
@@ -20,18 +20,18 @@ import subprocess
 import json
 
 # 'docker' (dev, per-recipe image) or 'local' (inside the packaged combined image).
-R_MODE = os.environ.get("WAKAFLAKA_R_MODE", "docker")
+R_MODE = os.environ.get("WAKAFLOCKA_R_MODE", "docker")
 
 # Directory holding the validated R recipes (backend/r_scripts by default).
 R_SCRIPTS_DIR = os.environ.get(
-    "WAKAFLAKA_R_SCRIPTS",
+    "WAKAFLOCKA_R_SCRIPTS",
     os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "r_scripts")),
 )
 
 # Docker image per recipe (dev mode only).
 IMAGE_FOR = {
-    "run_unmix.R": "wakaflaka-r:unmix",
-    "run_cytonorm.R": "wakaflaka-r:cytonorm",
+    "run_unmix.R": "wakaflocka-r:unmix",
+    "run_cytonorm.R": "wakaflocka-r:cytonorm",
 }
 
 
