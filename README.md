@@ -51,6 +51,9 @@ own:
 * **Reproducibility export** - every run produces a `.zip` bundle with the
   population table, UMAP coordinates, the marker panel, run parameters, and
   engine versions.
+* **FlowJo interoperability** - export an augmented FCS plus a FlowJo workspace
+  (`.wsp`) and a GatingML 2.0 file, so the automated populations open in FlowJo
+  as named gates.
 
 ## Installation
 
@@ -106,9 +109,10 @@ transparent marker-signature engine - it z-scores each marker's median across
 populations and matches the high/low profile against known lineage signatures
 (CD4/CD8 T-cell subsets, B, NK, monocytes, dendritic cells, and more).
 Annotation requires **marker names**: files whose FCS carries them (including the
-bundled demo) are labelled out of the box, while fluorophore-only files need a
-per-channel marker mapping first - a panel-editor step that is on the roadmap.
-All labels are editable.
+bundled demo) are labelled out of the box. Fluorophore-only files (e.g. `BUV395-A`)
+are mapped in a built-in **panel editor** - assign a marker to each channel, with a
+bulk-paste option for large panels - after which populations are re-annotated
+instantly without re-clustering. All labels are editable.
 
 ### Spectral unmixing
 
