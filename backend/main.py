@@ -26,7 +26,9 @@ from sqlalchemy.orm import Session as SASession
 from db import engine, SessionLocal, Base, get_db
 from models import Session as SessionModel, FCSFile, Job, BatchCorrectionRun
 import models_cluster  # noqa: F401 - registers ClusteringRun/Population on Base.metadata
+import models_diff  # noqa: F401 - registers DifferentialRun/DAResult/DSResult on Base.metadata
 from clustering_api import router as clustering_router
+from differential_api import router as differential_router
 import unmix_api
 from analysis import io as analysis_io
 import jobs
@@ -476,6 +478,7 @@ def get_job(job_id: str, db: SASession = Depends(get_db)):
 
 app.include_router(router)
 app.include_router(clustering_router)
+app.include_router(differential_router)
 app.include_router(unmix_api.router)
 
 
