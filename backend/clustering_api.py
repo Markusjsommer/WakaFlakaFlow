@@ -50,7 +50,8 @@ import os as _os
 from pathlib import Path as _Path
 
 _REPO_ROOT = _Path(__file__).resolve().parent.parent
-DEMO_FILE = str(_REPO_ROOT / "sample_data" / "spectral_pbmc" / "PBMC_spectral_UNMIXED.fcs")
+_SAMPLE_ROOT = _Path(_os.environ.get("WAKAFLOCKA_SAMPLE_DATA") or (_REPO_ROOT / "sample_data"))
+DEMO_FILE = str(_SAMPLE_ROOT / "spectral_pbmc" / "PBMC_spectral_UNMIXED.fcs")
 E1_PATH = str(_REPO_ROOT / "PBMC_40color_E1_UNMIXED.fcs")
 
 
@@ -67,8 +68,8 @@ _EVENTS_CACHE: dict[str, tuple] = {}
 _EVENTS_CACHE_MAX = 8
 
 # Per-cell labels are persisted here (not in the DB) so FlowJo/gate-path export
-# never has to re-run FlowSOM: data/runs/{run_id}/labels.npz.
-_RUNS_DIR = _REPO_ROOT / "data" / "runs"
+# never has to re-run FlowSOM: <data>/runs/{run_id}/labels.npz.
+_RUNS_DIR = _Path(_os.environ.get("WAKAFLOCKA_DATA") or (_REPO_ROOT / "data")) / "runs"
 
 router = APIRouter(prefix="/api/v1")
 

@@ -95,6 +95,21 @@ the container is running, open <http://localhost:8000>.
 > usable immediately with no data of your own; the demo files are preloaded in
 > the file selector, ready to run. See [Data](#bundled-data).
 
+### Python package (pip)
+
+The pure-Python feature set installs from a wheel and runs without Docker:
+
+    pip install wakaflockaflow
+    wakaflockaflow                 # serves the UI + API at http://127.0.0.1:8000
+
+This covers population identification, cohort analysis, differential testing (the
+Python rank-test engine), functional-state scoring, gating paths, and FlowJo
+export. The frontend and the demo dataset ship inside the wheel; runtime state is
+written to `./wakaflockaflow-data` (override with `--data-dir`). Spectral unmixing
+(AutoSpectral) and the diffcyt differential engine are R-based and available only
+in the Docker image or a conda environment. To build the wheel from a checkout,
+run `scripts/build_package.sh` (compiles the SPA and vendors it into the package).
+
 ## Usage
 
 ### Analyzing your own files
