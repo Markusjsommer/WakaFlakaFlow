@@ -30,7 +30,7 @@ export default function BiaxialPlot({ step, color = '#4477AA' }) {
       margin: { t: 10, r: 10, b: 40, l: 40 },
       height: 220,
       xaxis: { title: `${step.marker} (arcsinh)` },
-      yaxis: { title: 'rel. freq.', range: [0, 1.05] },
+      yaxis: { title: 'Relative frequency', range: [0, 1.05] },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
       showlegend: true,

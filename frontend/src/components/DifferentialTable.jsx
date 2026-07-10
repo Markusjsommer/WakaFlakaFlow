@@ -18,8 +18,8 @@ export default function DifferentialTable({ da = [], ds = [], onHover, onLeave, 
             <th style={{ ...th, textAlign: 'left' }}>Population</th>
             <th style={thNum}>log2 FC</th>
             <th style={thNum}>p</th>
-            <th style={thNum}>p (adj)</th>
-            <th style={thNum}>log CPM</th>
+            <th style={thNum} title="Benjamini-Hochberg adjusted p-value">p (adj)</th>
+            <th style={thNum} title="Average log2 counts per million across samples">log CPM</th>
           </tr>
         </thead>
         <tbody>

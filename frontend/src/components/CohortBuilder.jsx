@@ -51,7 +51,6 @@ export default function CohortBuilder({ sid, files = [], onRun, disabled }) {
       fcs_file_id: f.id,
       sample_label: f.filename,
       group: (rows[f.id].group || '').trim() || null,
-      batch: (rows[f.id].batch || '').trim() || null,
     }));
     onRun({ samples, n_clusters: Number(nClusters) || 15, seed: 42 });
   }
@@ -60,9 +59,10 @@ export default function CohortBuilder({ sid, files = [], onRun, disabled }) {
     <div className="card">
       <h2 className="card__title">Build a cohort</h2>
       <p className="field__hint" style={{ marginTop: 0 }}>
-        Select the samples to analyze together. They are clustered on one shared
-        UMAP so populations are directly comparable across samples. Tag each with a
-        group (e.g. control vs treated) to enable differential testing.
+        Select the samples to analyze together. They are pooled into one shared FlowSOM
+        clustering and UMAP embedding computed over the markers common to every sample, so
+        populations are directly comparable across samples. Tag each sample with a group
+        (e.g. control vs treated) to enable differential testing.
       </p>
 
       <div style={{ overflowX: 'auto' }}>
@@ -73,7 +73,6 @@ export default function CohortBuilder({ sid, files = [], onRun, disabled }) {
               <th style={{ ...th, textAlign: 'left' }}>Sample</th>
               <th style={thNum}>Events</th>
               <th style={{ ...th, textAlign: 'left' }}>Group</th>
-              <th style={{ ...th, textAlign: 'left' }}>Batch (optional)</th>
             </tr>
           </thead>
           <tbody>
@@ -99,16 +98,6 @@ export default function CohortBuilder({ sid, files = [], onRun, disabled }) {
                       disabled={disabled || !r.include}
                       placeholder="e.g. control"
                       onChange={(e) => setRow(f.id, { group: e.target.value })}
-                      style={textInput}
-                    />
-                  </td>
-                  <td style={td}>
-                    <input
-                      type="text"
-                      value={r.batch || ''}
-                      disabled={disabled || !r.include}
-                      placeholder="optional"
-                      onChange={(e) => setRow(f.id, { batch: e.target.value })}
                       style={textInput}
                     />
                   </td>

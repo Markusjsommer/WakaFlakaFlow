@@ -65,7 +65,7 @@ export default function DifferentialPanel({ samples = [], disabled, onRun }) {
               <select value={engine} disabled={disabled} onChange={(e) => setEngine(e.target.value)} style={sel}>
                 <option value="python">Python rank tests (always available)</option>
                 <option value="auto">diffcyt if available, else Python</option>
-                <option value="diffcyt">diffcyt (edgeR + limma, needs R)</option>
+                <option value="diffcyt">diffcyt (edgeR + limma, Docker/conda image only)</option>
               </select>
             </label>
             <button type="button" className="run-btn" disabled={disabled || !enough} onClick={run}>

@@ -385,10 +385,14 @@ export default function App() {
         <section className="page-intro">
           <h1>Automated cell population identification</h1>
           <p className="app__sub">
-            Point at a spectral flow cytometry FCS file. WakaFlockaFlow transforms the
-            events, clusters them with FlowSOM, embeds them with UMAP, and returns named
-            cell populations with counts, frequencies, and median-marker profiles.
-            Everything runs locally; no data leaves your machine.
+            Point WakaFlockaFlow at one unmixed spectral flow cytometry FCS file, a whole
+            cohort, or a raw file that still needs unmixing. It clusters cells with FlowSOM,
+            embeds them with UMAP, and returns named cell populations with counts,
+            frequencies, median-marker profiles, and functional-state scores where the panel
+            carries the relevant markers. For a single file it also reconstructs the gating
+            path to each population and exports to FlowJo. For a cohort it pools every sample
+            onto one shared UMAP and tests what changes between conditions. Everything runs
+            locally; no data leaves your machine.
           </p>
         </section>
 
@@ -416,7 +420,7 @@ export default function App() {
             onClick={() => setMode('unmix')}
             disabled={running || unmixRunning}
           >
-            Unmix raw → analyze
+            Unmix raw, then analyze
           </button>
         </nav>
 
@@ -634,7 +638,7 @@ export default function App() {
                     <a
                       className="run-btn"
                       href={flowjoUrl(sessionId, run.id)}
-                      title="Augmented FCS + workspace.wsp + GatingML — opens in FlowJo as named gates"
+                      title="Augmented FCS, workspace.wsp, and GatingML. Opens in FlowJo as named gates."
                       style={{
                         textDecoration: 'none',
                         background: '#fff',

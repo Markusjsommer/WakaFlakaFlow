@@ -208,7 +208,6 @@ td .marker-chip, .marker-chip {
 tbody input[type='text'] { padding: 6px 8px; font-size: 0.88rem; font-weight: 600; }
 
 /* ---------------------------------------------------------------- plots */
-.umap-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .plot { min-height: 320px; }
 
 .error {
@@ -236,7 +235,6 @@ tbody input[type='text'] { padding: 6px 8px; font-size: 0.88rem; font-weight: 60
 .dropzone__note { color: var(--accent-dark); font-size: 0.85rem; font-weight: 500; }
 
 @media (max-width: 860px) {
-  .umap-pair { grid-template-columns: 1fr; }
   .wordmark__tag { display: none; }
   .app__body { padding: 24px 16px 72px; }
 }

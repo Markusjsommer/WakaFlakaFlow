@@ -92,13 +92,13 @@ export default function Controls({ onRun, disabled, files = [], channels = [] })
           </select>
         ) : (
           <span className="field__hint">
-            No files registered yet. The bundled demo acquisition will be used.
+            No FCS files found. The bundled demo dataset will be used.
           </span>
         )}
         <span className="field__hint">
-          Drop your own <code>.fcs</code> into <code>./fcs</code> (see README) or run the
-          bundled demo panel out of the box. Nothing is uploaded anywhere. All analysis
-          runs locally.
+          Drop your own <code>.fcs</code> files into <code>./fcs</code> (see README), or use
+          the bundled demo dataset out of the box. Nothing is uploaded; all analysis runs
+          locally in your browser.
         </span>
       </label>
 
@@ -146,7 +146,7 @@ export default function Controls({ onRun, disabled, files = [], channels = [] })
       {/* Metacluster count ------------------------------------------------ */}
       <div className="field">
         <span className="field__label">
-          Number of populations (metaclusters): <strong>{nClusters}</strong>
+          Number of populations: <strong>{nClusters}</strong>
         </span>
         <div className="engine-toggle" style={{ flexWrap: 'wrap', alignItems: 'center' }}>
           {CLUSTER_PRESETS.map((n) => (
@@ -178,8 +178,8 @@ export default function Controls({ onRun, disabled, files = [], channels = [] })
           </label>
         </div>
         <span className="field__hint">
-          FlowSOM builds a self-organizing map then meta-clusters its nodes into this many
-          populations. Pick a preset or enter a custom value (2 to 60).
+          FlowSOM builds a self-organizing map, then groups its nodes into this many
+          populations (metaclusters). Choose a preset or enter a custom value (2 to 60).
         </span>
       </div>
 

@@ -4,7 +4,7 @@ export default function SampleHighlightSelector({ samples = [], value, onChange 
   if (!samples || samples.length === 0) return null;
   return (
     <label className="field" style={{ maxWidth: 320, marginBottom: 12 }}>
-      <span className="field__label">Highlight sample on the embedding</span>
+      <span className="field__label">Highlight sample on the shared UMAP</span>
       <select
         value={value == null ? '' : String(value)}
         onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))}

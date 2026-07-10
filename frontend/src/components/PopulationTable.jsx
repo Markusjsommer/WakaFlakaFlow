@@ -118,9 +118,9 @@ export default function PopulationTable({ populations = [], onPatch, onHover, on
           <tr>
             <th style={th}></th>
             <th style={{ ...th, textAlign: 'left' }}>Population</th>
-            <th style={thNum}>Cluster</th>
+            <th style={thNum}>Cluster ID</th>
             <th style={thNum}>Cells</th>
-            <th style={thNum}>%</th>
+            <th style={thNum}>Frequency (%)</th>
             <th style={{ ...th, textAlign: 'left' }}>Functional state</th>
             <th style={{ ...th, textAlign: 'left' }}>Top median markers</th>
           </tr>

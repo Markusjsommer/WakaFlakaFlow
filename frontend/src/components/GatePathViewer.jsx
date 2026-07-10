@@ -43,8 +43,8 @@ export default function GatePathViewer({ sid, rid, onHover, onLeave }) {
     <div>
       <p className="field__hint" style={{ marginTop: 0 }}>
         The shortest sequence of marker gates that reproduces each population (a
-        one-vs-rest decision tree). The F1 badge is how faithfully the gate
-        reconstructs the cluster. Expand a population to see each gate on a biaxial plot.
+        one-vs-rest decision tree). The F1 badge measures how faithfully the gate
+        reconstructs the population. Expand a population to see each gate on a biaxial plot.
       </p>
       {data.populations.map((p) => {
         const open = openMc === p.metacluster_id;

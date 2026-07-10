@@ -44,8 +44,9 @@ export default function UnmixPanel({
       <h2 className="card__title">Unmix raw spectral data</h2>
 
       <p className="field__hint" style={{ marginTop: 0, marginBottom: 16 }}>
-        Raw spectral detector data + single-stain controls &rarr; per-marker abundances
-        via AutoSpectral. The unmixed file then feeds population identification.
+        Raw spectral detector data plus single-stain controls, unmixed into per-marker
+        abundances with AutoSpectral. The unmixed file then feeds population
+        identification. AutoSpectral runs in R and is available only in the Docker image.
       </p>
 
       {/* Raw file selector ------------------------------------------------- */}
@@ -71,7 +72,7 @@ export default function UnmixPanel({
           </span>
         )}
         <span className="field__hint">
-          The bundled <code>{DEMO_RAW}</code> works out of the box.
+          The bundled <code>{DEMO_RAW}</code> is ready to use.
         </span>
       </label>
 
@@ -99,7 +100,7 @@ export default function UnmixPanel({
             disabled={disabled}
           />
           <span>
-            Use controls I added to <code>./fcs</code>
+            Use controls added to <code>./fcs</code>
           </span>
         </label>
         <span className="field__hint">
@@ -137,8 +138,8 @@ export default function UnmixPanel({
           }}
         >
           <span>
-            Unmixed &rarr; <strong>{result.unmixed_filename || '[unmixed] file'}</strong>{' '}
-            ready
+            Unmixed file <strong>{result.unmixed_filename || '[unmixed] file'}</strong>{' '}
+            is ready.
           </span>
           <button
             type="button"
