@@ -370,7 +370,7 @@ def _run_clustering(job_id: str, run_id: str, sid: str, params: dict) -> None:
                         clustering_run_id=run_id,
                         parent_id=None,
                         name=(annotations[order]["label"]
-                              or f"Population {int(pop['metacluster_id']) + 1}"),
+                              or f"Unnamed Population {int(pop['metacluster_id']) + 1}"),
                         metacluster_id=int(pop["metacluster_id"]),
                         cell_count=int(pop["cell_count"]),
                         percentage_of_parent=float(pop["percentage"]),
@@ -477,7 +477,7 @@ def reannotate_clustering(sid: str, rid: str):
         annotations = _annotate.annotate_populations(pop_dicts, channel_to_marker=ch_map)
         for order, p in enumerate(pops):
             label = annotations[order]["label"] if order < len(annotations) else None
-            p.name = label or f"Population {int(p.metacluster_id) + 1}"
+            p.name = label or f"Unnamed Population {int(p.metacluster_id) + 1}"
         db.commit()
         db.refresh(run)
         return _run_payload(run)

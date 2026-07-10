@@ -272,7 +272,8 @@ export default function App() {
   const totalCells = populations.reduce((s, p) => s + (Number(p.cell_count) || 0), 0);
   // If nothing got a cell-type name, the file's channels aren't marker-named.
   const noneAnnotated =
-    populations.length > 0 && populations.every((p) => /^Population \d+$/.test(p.name || ''));
+    populations.length > 0 &&
+    populations.every((p) => /^Unnamed Population \d+$/.test(p.name || ''));
 
   return (
     <div className="app">

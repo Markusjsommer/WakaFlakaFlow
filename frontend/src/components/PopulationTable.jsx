@@ -55,7 +55,14 @@ function NameCell({ pop, onPatch, disabled }) {
 }
 
 export default function PopulationTable({ populations = [], onPatch, onHover, onLeave, disabled }) {
-  const sorted = [...populations].sort((a, b) => a.metacluster_id - b.metacluster_id);
+  // Named (cell-typed) populations first, unnamed ones at the bottom; by size within each group.
+  const isUnnamed = (p) => /^Unnamed Population \d+$/.test(p.name || '');
+  const sorted = [...populations].sort((a, b) => {
+    const ua = isUnnamed(a);
+    const ub = isUnnamed(b);
+    if (ua !== ub) return ua ? 1 : -1;
+    return (b.cell_count || 0) - (a.cell_count || 0);
+  });
 
   return (
     <div style={{ overflowX: 'auto' }}>
