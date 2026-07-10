@@ -15,6 +15,8 @@ import {
   listUnmixControls,
   startUnmix,
   reannotate,
+  startCohort,
+  getBreakdown,
 } from './api.js';
 import Controls from './components/Controls.jsx';
 import ProgressBar from './components/ProgressBar.jsx';
@@ -22,6 +24,9 @@ import UmapScatter from './components/UmapScatter.jsx';
 import PopulationTable from './components/PopulationTable.jsx';
 import UnmixPanel from './components/UnmixPanel.jsx';
 import PanelEditor from './components/PanelEditor.jsx';
+import CohortBuilder from './components/CohortBuilder.jsx';
+import SampleHighlightSelector from './components/SampleHighlightSelector.jsx';
+import BreakdownTable from './components/BreakdownTable.jsx';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -55,10 +60,12 @@ export default function App() {
   const [run, setRun] = useState(null);
   const [error, setError] = useState(null);
   const [highlightMc, setHighlightMc] = useState(null);
+  const [highlightSample, setHighlightSample] = useState(null);
+  const [breakdown, setBreakdown] = useState(null);
   const initedRef = useRef(false);
 
   // v2 spectral-unmixing path -------------------------------------------------
-  const [mode, setMode] = useState('analyze'); // 'analyze' (existing) | 'unmix'
+  const [mode, setMode] = useState('analyze'); // 'analyze' | 'cohort' | 'unmix'
   const [unmixJob, setUnmixJob] = useState(null);
   const [unmixRunning, setUnmixRunning] = useState(false);
   const [unmixResult, setUnmixResult] = useState(null);
@@ -169,6 +176,41 @@ export default function App() {
       if (!rid) throw new Error('Job completed but no clustering run was found');
       const runData = await getClusteringRun(sessionId, rid);
       setRun(runData);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  async function handleRunCohort({ samples, n_clusters, seed }) {
+    if (!sessionId) return;
+    setError(null);
+    setRun(null);
+    setBreakdown(null);
+    setHighlightMc(null);
+    setHighlightSample(null);
+    setRunning(true);
+    setJob({ status: 'pending', progress: 0, message: 'Submitting cohort job…' });
+    try {
+      const { job_id, clustering_run_id } = await startCohort(sessionId, {
+        samples,
+        n_clusters,
+        seed,
+      });
+      const finalJob = await pollUntilDone(job_id);
+      if (finalJob.status === 'failed') {
+        throw new Error(finalJob.error || 'Cohort job failed');
+      }
+      const rid =
+        (finalJob.result && finalJob.result.clustering_run_id) || clustering_run_id;
+      const runData = await getClusteringRun(sessionId, rid);
+      setRun(runData);
+      try {
+        setBreakdown(await getBreakdown(sessionId, rid));
+      } catch (_) {
+        /* breakdown is supplementary */
+      }
     } catch (e) {
       setError(e.message);
     } finally {
@@ -315,6 +357,14 @@ export default function App() {
           </button>
           <button
             type="button"
+            className={'tab' + (mode === 'cohort' ? ' is-active' : '')}
+            onClick={() => setMode('cohort')}
+            disabled={running || unmixRunning}
+          >
+            Cohort (many samples)
+          </button>
+          <button
+            type="button"
             className={'tab' + (mode === 'unmix' ? ' is-active' : '')}
             onClick={() => setMode('unmix')}
             disabled={running || unmixRunning}
@@ -323,7 +373,7 @@ export default function App() {
           </button>
         </nav>
 
-        {mode === 'analyze' ? (
+        {mode === 'analyze' && (
           <>
             <div
               className={'dropzone' + (dragOver ? ' is-drag' : '')}
@@ -375,7 +425,21 @@ export default function App() {
 
             {(running || job) && <ProgressBar job={job} />}
           </>
-        ) : (
+        )}
+
+        {mode === 'cohort' && (
+          <>
+            <CohortBuilder
+              sid={sessionId}
+              files={files}
+              onRun={handleRunCohort}
+              disabled={running || !sessionId}
+            />
+            {(running || job) && <ProgressBar job={job} />}
+          </>
+        )}
+
+        {mode === 'unmix' && (
           <UnmixPanel
             files={files}
             bundledCount={bundledCount}
@@ -394,7 +458,7 @@ export default function App() {
           </div>
         )}
 
-        {mode === 'analyze' && run && (
+        {(mode === 'analyze' || mode === 'cohort') && run && (
           <section className="results">
             <div className="headline card">
               <div className="headline__big">
@@ -402,8 +466,10 @@ export default function App() {
                 {populations.length === 1 ? 'population' : 'populations'}
               </div>
               <div className="headline__detail">
-                across {totalCells.toLocaleString()} clustered cells · FlowSOM +
-                UMAP
+                across {totalCells.toLocaleString()} clustered cells · FlowSOM + UMAP
+                {run.mode === 'cohort' && run.n_samples
+                  ? ` · ${run.n_samples} samples`
+                  : ''}
               </div>
             </div>
 
@@ -418,12 +484,31 @@ export default function App() {
             )}
 
             <div className="card">
+              {run.mode === 'cohort' && (
+                <SampleHighlightSelector
+                  samples={run.samples || []}
+                  value={highlightSample}
+                  onChange={setHighlightSample}
+                />
+              )}
               <UmapScatter
                 umap={run.umap || []}
                 populations={populations}
                 highlightMc={highlightMc}
+                highlightSample={highlightSample}
               />
             </div>
+
+            {run.mode === 'cohort' && breakdown && (
+              <BreakdownTable
+                breakdown={breakdown}
+                onHoverPopulation={setHighlightMc}
+                onHoverSample={setHighlightSample}
+                onLeave={() => {
+                  setHighlightMc(null);
+                }}
+              />
+            )}
 
             <div className="card">
               <div
@@ -447,20 +532,22 @@ export default function App() {
                   >
                     Export results (.zip)
                   </a>
-                  <a
-                    className="run-btn"
-                    href={flowjoUrl(sessionId, run.id)}
-                    title="Augmented FCS + workspace.wsp + GatingML — opens in FlowJo as named gates"
-                    style={{
-                      textDecoration: 'none',
-                      background: '#fff',
-                      color: 'var(--accent-dark)',
-                      border: '1px solid var(--accent)',
-                      boxShadow: 'none',
-                    }}
-                  >
-                    Export for FlowJo (.wsp)
-                  </a>
+                  {run.mode !== 'cohort' && (
+                    <a
+                      className="run-btn"
+                      href={flowjoUrl(sessionId, run.id)}
+                      title="Augmented FCS + workspace.wsp + GatingML — opens in FlowJo as named gates"
+                      style={{
+                        textDecoration: 'none',
+                        background: '#fff',
+                        color: 'var(--accent-dark)',
+                        border: '1px solid var(--accent)',
+                        boxShadow: 'none',
+                      }}
+                    >
+                      Export for FlowJo (.wsp)
+                    </a>
+                  )}
                 </div>
               </div>
               <PopulationTable
