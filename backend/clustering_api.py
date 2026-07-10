@@ -132,6 +132,20 @@ def _resolve_marker_idx(channel_names: list, markers: list | None) -> list:
     return analysis_io.marker_indices(channel_names, exclude_scatter=True)
 
 
+def _channel_marker_map(sid: str, channel_names: list, marker_labels: list) -> dict:
+    """Channel -> marker map that drives annotation. Starts from the file's own
+    $PnS stain labels (when they carry a marker distinct from the channel name),
+    then applies saved panel-editor overrides (overrides win). This lets any FCS
+    that names its markers -- in $PnN OR $PnS -- auto-annotate without user input."""
+    auto: dict[str, str] = {}
+    for i, ch in enumerate(channel_names):
+        lbl = marker_labels[i] if i < len(marker_labels) else ""
+        if lbl and lbl != ch:
+            auto[ch] = lbl
+    auto.update(PANEL_MARKERS.get(sid, {}))
+    return auto
+
+
 def _run_payload(run: ClusteringRun) -> dict:
     """Full run detail payload (params, umap, populations)."""
     pops = sorted(run.populations, key=lambda p: p.metacluster_id)
@@ -310,7 +324,7 @@ def _run_clustering(job_id: str, run_id: str, sid: str, params: dict) -> None:
             path, fcs_file_id = _resolve_path(db, sid, params.get("fcs_file_id"))
         finally:
             db.close()
-        events, channel_names, _labels = _load_cached(path)
+        events, channel_names, marker_labels = _load_cached(path)
         marker_idx = _resolve_marker_idx(channel_names, params.get("markers"))
 
         # 40 ----------------------------------------------------------------- FlowSOM
@@ -327,9 +341,11 @@ def _run_clustering(job_id: str, run_id: str, sid: str, params: dict) -> None:
         labels = np.asarray(result["labels"]).astype(int)
         populations = result["populations"]
 
-        # auto-annotate populations with canonical cell types (editable afterwards)
+        # auto-annotate populations with canonical cell types (editable afterwards).
+        # Uses the file's own $PnN/$PnS marker names plus any panel-editor overrides.
         annotations = _annotate.annotate_populations(
-            populations, channel_to_marker=PANEL_MARKERS.get(sid)
+            populations,
+            channel_to_marker=_channel_marker_map(sid, channel_names, marker_labels),
         )
 
         # 75 ----------------------------------------------------------------- UMAP
@@ -452,9 +468,13 @@ def reannotate_clustering(sid: str, rid: str):
             }
             for p in pops
         ]
-        annotations = _annotate.annotate_populations(
-            pop_dicts, channel_to_marker=PANEL_MARKERS.get(sid)
-        )
+        try:
+            path, _ = _resolve_path(db, sid, (run.params or {}).get("fcs_file_id"))
+            _e, channel_names, marker_labels = _load_cached(path)
+            ch_map = _channel_marker_map(sid, channel_names, marker_labels)
+        except Exception:  # noqa: BLE001
+            ch_map = PANEL_MARKERS.get(sid, {})
+        annotations = _annotate.annotate_populations(pop_dicts, channel_to_marker=ch_map)
         for order, p in enumerate(pops):
             label = annotations[order]["label"] if order < len(annotations) else None
             p.name = label or f"Population {int(p.metacluster_id) + 1}"
