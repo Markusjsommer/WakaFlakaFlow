@@ -38,6 +38,7 @@ from analysis import io as analysis_io
 from analysis import cluster
 from analysis import annotate as _annotate
 from analysis import cohort as _cohort
+from analysis import state_axes as _state_axes
 
 # Per-session channel -> marker-name overrides (the panel editor). Lets fluorophore-
 # named files (e.g. BUV395-A -> CD19) be annotated. Empty = use the file's own names.
@@ -228,7 +229,7 @@ def _run_payload(run: ClusteringRun) -> dict:
         "is_active": run.is_active,
         "created_at": run.created_at.isoformat() if run.created_at else None,
         "umap": run.umap or [],
-        "populations": [_pop_payload(p) for p in pops],
+        "populations": _pops_with_axes(pops),
         "mode": getattr(run, "mode", "single") or "single",
         "n_samples": getattr(run, "n_samples", None),
         "shared_markers": getattr(run, "shared_markers", None),
@@ -250,7 +251,7 @@ def _run_payload(run: ClusteringRun) -> dict:
     return payload
 
 
-def _pop_payload(p: Population) -> dict:
+def _pop_payload(p: Population, axes=None) -> dict:
     return {
         "id": p.id,
         "name": p.name,
@@ -259,7 +260,18 @@ def _pop_payload(p: Population) -> dict:
         "percentage_of_parent": p.percentage_of_parent,
         "median_expression": p.median_expression or {},
         "color": p.color,
+        "state_axes": axes or [],
     }
+
+
+def _pops_with_axes(pops: list) -> list:
+    """Payloads for a list of populations, with functional-state axes scored
+    across the whole set (requires all populations together to z-score)."""
+    axes_list = _state_axes.score_axes(
+        [{"median_expression": p.median_expression or {}} for p in pops]
+    )
+    return [_pop_payload(p, axes_list[i] if i < len(axes_list) else [])
+            for i, p in enumerate(pops)]
 
 
 # --------------------------------------------------------------------------- panel template
@@ -832,7 +844,7 @@ def get_populations(sid: str, rid: str, db: SASession = Depends(get_db)):
     if run is None or run.session_id != sid:
         raise HTTPException(status_code=404, detail="clustering run not found")
     pops = sorted(run.populations, key=lambda p: p.metacluster_id)
-    return [_pop_payload(p) for p in pops]
+    return _pops_with_axes(pops)
 
 
 @router.patch("/sessions/{sid}/clustering/{rid}/populations/{pid}")
