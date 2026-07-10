@@ -91,7 +91,7 @@ export default function PopulationTable({ populations = [], onPatch, onHover, on
                 <td style={td}>
                   <input
                     type="color"
-                    value={pop.color || '#4DBBD5'}
+                    value={pop.color || '#4477AA'}
                     onChange={(e) => onPatch(pop.id, { color: e.target.value })}
                     disabled={disabled}
                     aria-label={`Recolor population ${pop.metacluster_id}`}

@@ -25,18 +25,27 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db import Base
 
-# 10-color colorblind-safe palette (NPG-inspired) for default population colors.
+# Colorblind-safe qualitative palette for default population colors.
+# Paul Tol's "bright" scheme followed by the Okabe-Ito set and Tol "muted"
+# extras; every entry is distinguishable under deuteranopia/protanopia and the
+# first eight are ordered for maximum separation (most populations use those).
 POPULATION_PALETTE = [
-    "#E64B35",
-    "#4DBBD5",
-    "#00A087",
-    "#3C5488",
-    "#F39B7F",
-    "#8491B4",
-    "#91D1C2",
-    "#DC0000",
-    "#7E6148",
-    "#B09C85",
+    "#4477AA",  # blue
+    "#EE6677",  # rose
+    "#228833",  # green
+    "#CCBB44",  # olive-yellow
+    "#66CCEE",  # cyan
+    "#AA3377",  # purple
+    "#E69F00",  # orange
+    "#0072B2",  # deep blue
+    "#009E73",  # bluish green
+    "#D55E00",  # vermillion
+    "#CC79A7",  # reddish purple
+    "#332288",  # indigo
+    "#117733",  # dark green
+    "#882255",  # wine
+    "#999933",  # olive
+    "#56B4E9",  # sky
 ]
 
 
