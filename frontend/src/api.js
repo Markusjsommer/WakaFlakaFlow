@@ -141,6 +141,29 @@ export async function tagSample(sid, rid, sampleId, body) {
   });
 }
 
+// ---- Differential analysis --------------------------------------------------
+
+// POST /sessions/{sid}/clustering/{rid}/differential -> { job_id, differential_run_id }
+// body: { group_field, contrast?, covariates?, paired_field?, min_cells?, min_samples?, engine }
+export async function startDifferential(sid, rid, body) {
+  return req(`/sessions/${sid}/clustering/${rid}/differential`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+}
+
+// GET /sessions/{sid}/clustering/{rid}/differential/{did}
+//   -> { status, engine, notes, da: [...], ds: [...] }
+export async function getDifferentialRun(sid, rid, did) {
+  return req(`/sessions/${sid}/clustering/${rid}/differential/${did}`);
+}
+
+// Direct-download URL for the differential results (.zip: da/ds CSVs + README).
+export function differentialExportUrl(sid, rid, did) {
+  return `${BASE}/sessions/${sid}/clustering/${rid}/differential/${did}/export`;
+}
+
 // ---- Spectral unmixing (v2) --------------------------------------------------
 
 // GET /sessions/{sid}/unmix/controls -> { bundled: [names], count }

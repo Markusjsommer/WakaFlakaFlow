@@ -17,6 +17,9 @@ import {
   reannotate,
   startCohort,
   getBreakdown,
+  startDifferential,
+  getDifferentialRun,
+  differentialExportUrl,
 } from './api.js';
 import Controls from './components/Controls.jsx';
 import ProgressBar from './components/ProgressBar.jsx';
@@ -27,6 +30,9 @@ import PanelEditor from './components/PanelEditor.jsx';
 import CohortBuilder from './components/CohortBuilder.jsx';
 import SampleHighlightSelector from './components/SampleHighlightSelector.jsx';
 import BreakdownTable from './components/BreakdownTable.jsx';
+import DifferentialPanel from './components/DifferentialPanel.jsx';
+import VolcanoPlot from './components/VolcanoPlot.jsx';
+import DifferentialTable from './components/DifferentialTable.jsx';
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -62,6 +68,9 @@ export default function App() {
   const [highlightMc, setHighlightMc] = useState(null);
   const [highlightSample, setHighlightSample] = useState(null);
   const [breakdown, setBreakdown] = useState(null);
+  const [diffRun, setDiffRun] = useState(null);
+  const [diffJob, setDiffJob] = useState(null);
+  const [diffRunning, setDiffRunning] = useState(false);
   const initedRef = useRef(false);
 
   // v2 spectral-unmixing path -------------------------------------------------
@@ -188,6 +197,8 @@ export default function App() {
     setError(null);
     setRun(null);
     setBreakdown(null);
+    setDiffRun(null);
+    setDiffJob(null);
     setHighlightMc(null);
     setHighlightSample(null);
     setRunning(true);
@@ -215,6 +226,41 @@ export default function App() {
       setError(e.message);
     } finally {
       setRunning(false);
+    }
+  }
+
+  async function handleRunDifferential(config) {
+    if (!sessionId || !run) return;
+    setError(null);
+    setDiffRun(null);
+    setDiffRunning(true);
+    setDiffJob({ status: 'pending', progress: 0, message: 'Submitting differential job…' });
+    try {
+      const { job_id, differential_run_id } = await startDifferential(
+        sessionId,
+        run.id,
+        config
+      );
+      let final;
+      for (;;) {
+        const j = await pollJob(job_id);
+        setDiffJob(j);
+        if (j.status !== 'pending' && j.status !== 'running') {
+          final = j;
+          break;
+        }
+        await delay(1500);
+      }
+      if (final.status === 'failed') {
+        throw new Error(final.error || 'Differential job failed');
+      }
+      const did =
+        (final.result && final.result.differential_run_id) || differential_run_id;
+      setDiffRun(await getDifferentialRun(sessionId, run.id, did));
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setDiffRunning(false);
     }
   }
 
@@ -508,6 +554,57 @@ export default function App() {
                   setHighlightMc(null);
                 }}
               />
+            )}
+
+            {run.mode === 'cohort' && (
+              <>
+                <DifferentialPanel
+                  samples={run.samples || []}
+                  disabled={diffRunning}
+                  onRun={handleRunDifferential}
+                />
+                {(diffRunning || diffJob) && <ProgressBar job={diffJob} />}
+                {diffRun && (
+                  <div className="card">
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        marginBottom: 12,
+                        gap: 12,
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <h2 className="card__title" style={{ margin: 0 }}>
+                        Differential results{' '}
+                        <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '0.85rem' }}>
+                          ({diffRun.engine})
+                        </span>
+                      </h2>
+                      <a
+                        className="run-btn"
+                        href={differentialExportUrl(sessionId, run.id, diffRun.id)}
+                        style={{ textDecoration: 'none' }}
+                      >
+                        Export differential (.zip)
+                      </a>
+                    </div>
+                    {diffRun.notes && Object.keys(diffRun.notes).length > 0 && (
+                      <p className="field__hint" style={{ marginTop: 0 }}>
+                        {Object.values(diffRun.notes).join(' · ')}
+                      </p>
+                    )}
+                    <VolcanoPlot da={diffRun.da || []} />
+                    <DifferentialTable
+                      da={diffRun.da || []}
+                      ds={diffRun.ds || []}
+                      onHover={setHighlightMc}
+                      onLeave={() => setHighlightMc(null)}
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             <div className="card">
