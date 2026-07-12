@@ -255,6 +255,29 @@ app.add_middleware(
 router = APIRouter(prefix="/api/v1")
 
 
+# --------------------------------------------------------------------------- capabilities
+@router.get("/capabilities")
+def capabilities():
+    """What this deployment can actually run. R-based features (spectral unmixing
+    via AutoSpectral, the diffcyt differential engine) are only available where R
+    is reachable, so the UI gates on this instead of offering steps that will fail.
+    """
+    from analysis import r_engine
+
+    return {
+        "r_mode": r_engine.R_MODE,
+        "unmix": r_engine.engine_available("run_unmix.R"),
+        "diffcyt": r_engine.engine_available("run_diffcyt.R"),
+        # These are pure-Python and always available.
+        "population_id": True,
+        "cohort": True,
+        "differential_python": True,
+        "functional_state": True,
+        "gate_paths": True,
+        "flowjo_export": True,
+    }
+
+
 # --------------------------------------------------------------------------- sessions / files
 @router.post("/sessions")
 def create_session(payload: SessionCreate | None = None, db: SASession = Depends(get_db)):

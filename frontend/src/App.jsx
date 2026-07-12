@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createSession,
   getDefaultSession,
+  getCapabilities,
   listFiles,
   uploadFiles,
   getPanelTemplate,
@@ -69,6 +70,7 @@ export default function App() {
   const [highlightMc, setHighlightMc] = useState(null);
   const [highlightSample, setHighlightSample] = useState(null);
   const [breakdown, setBreakdown] = useState(null);
+  const [caps, setCaps] = useState(null);
   const [diffRun, setDiffRun] = useState(null);
   const [diffJob, setDiffJob] = useState(null);
   const [diffRunning, setDiffRunning] = useState(false);
@@ -123,6 +125,11 @@ export default function App() {
           sid = await createSession();
         }
         setSessionId(sid);
+        try {
+          setCaps(await getCapabilities());
+        } catch (_) {
+          /* capabilities are best-effort; default to showing everything */
+        }
         try {
           const list = (await listFiles(sid)) || [];
           setFiles(list);
@@ -418,11 +425,27 @@ export default function App() {
             type="button"
             className={'tab' + (mode === 'unmix' ? ' is-active' : '')}
             onClick={() => setMode('unmix')}
-            disabled={running || unmixRunning}
+            disabled={running || unmixRunning || (caps && !caps.unmix)}
+            title={
+              caps && !caps.unmix
+                ? 'Spectral unmixing runs AutoSpectral in R, available only in the Docker deployment'
+                : undefined
+            }
           >
             Unmix raw, then analyze
+            {caps && !caps.unmix ? ' (Docker only)' : ''}
           </button>
         </nav>
+
+        {caps && (!caps.unmix || !caps.diffcyt) && (
+          <p className="field__hint" style={{ marginTop: 4 }}>
+            Available in this deployment: population identification, cohort analysis,
+            differential testing (Python engine), functional state, gating paths, and
+            FlowJo export. Spectral unmixing (AutoSpectral)
+            {!caps.diffcyt ? ' and the diffcyt differential engine' : ''} run in R and are
+            available only via <code>docker compose up</code>.
+          </p>
+        )}
 
         {mode === 'analyze' && (
           <>
@@ -566,6 +589,7 @@ export default function App() {
                 <DifferentialPanel
                   samples={run.samples || []}
                   disabled={diffRunning}
+                  diffcytAvailable={!!(caps && caps.diffcyt)}
                   onRun={handleRunDifferential}
                 />
                 {(diffRunning || diffJob) && <ProgressBar job={diffJob} />}

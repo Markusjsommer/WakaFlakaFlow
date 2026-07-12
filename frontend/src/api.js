@@ -46,6 +46,12 @@ export async function getDefaultSession() {
   return data.session_id;
 }
 
+// GET /capabilities -> { r_mode, unmix, diffcyt, ...always-on flags }
+// What this deployment can actually run; the UI gates R-only features on it.
+export async function getCapabilities() {
+  return req('/capabilities');
+}
+
 // GET /sessions/{sid}/files -> [{ id, filename, n_events, n_channels }]
 export async function listFiles(sid) {
   return req(`/sessions/${sid}/files`);
