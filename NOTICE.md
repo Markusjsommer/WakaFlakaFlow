@@ -59,3 +59,9 @@ demo (`fullPanel.fcs`). Source: <https://bioconductor.org/packages/flowSpecs/>.
 To analyze your own data, drop `.fcs` files into `./fcs/` and run
 `docker compose up` (see [`README.md`](README.md)), they are registered alongside
 the bundled demo, and nothing leaves your machine.
+
+## Bundled UI asset
+
+The loading animation ([`frontend/public/bongo-loading.gif`](frontend/public/bongo-loading.gif))
+is a "Bongo Cat" GIF, used under a permissive license per the project maintainer.
+Bongo Cat originates with StrayRogue (art) and DitzyFlama (animation).
