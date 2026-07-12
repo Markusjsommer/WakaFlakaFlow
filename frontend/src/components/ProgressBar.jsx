@@ -10,16 +10,24 @@ export default function ProgressBar({ job }) {
   return (
     <div className="progress">
       {working && (
-        <img
-          src="/bongo-loading.gif"
-          alt=""
-          aria-hidden="true"
-          className="progress__bongo"
-          onError={(e) => {
-            e.currentTarget.style.display = 'none';
-          }}
-          style={{ display: 'block', height: 56, margin: '0 auto 10px', objectFit: 'contain' }}
-        />
+        <div
+          className="progress__bongos"
+          style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 10 }}
+        >
+          {Array.from({ length: 7 }).map((_, i) => (
+            <img
+              key={i}
+              src="/bongo-loading.gif"
+              alt=""
+              aria-hidden="true"
+              className="progress__bongo"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+              style={{ display: 'block', height: 56, objectFit: 'contain' }}
+            />
+          ))}
+        </div>
       )}
       <div className="progress__header">
         <span className="progress__label">
