@@ -134,8 +134,8 @@ export default function PanelEditor({ sid, fileId, onApplied }) {
         <div style={{ marginTop: 16 }}>
           <p className="field__hint" style={{ marginTop: 0, marginBottom: 16 }}>
             Map each channel to a marker (e.g. BUV395-A &rarr; CD19) so populations can be
-            auto-labelled with cell types. Files that already carry marker names need no
-            changes.
+            automatically annotated with cell types. Files that already carry marker names
+            need no changes.
           </p>
 
           {error && (
@@ -186,8 +186,8 @@ export default function PanelEditor({ sid, fileId, onApplied }) {
                   })}
                 </div>
                 <span className="field__hint">
-                  Channel names are read-only. Scatter / Time channels are shown greyed and
-                  tagged as excluded, but can still be mapped if you want.
+                  Channel names are read-only. Scatter and Time channels are greyed and
+                  tagged as excluded, but you can still map them.
                 </span>
               </div>
 

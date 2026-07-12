@@ -37,3 +37,5 @@ scratchpad/
 # Vendored into the wheel by scripts/build_package.sh (source lives elsewhere)
 /backend/webui/
 /backend/sample_data/
+/_local_only/
+/data-docker/

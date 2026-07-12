@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 // Configure + launch a differential run on the current cohort. Groups come from
 // the samples' tags; if there are more than two you pick the pair to contrast.
-export default function DifferentialPanel({ samples = [], disabled, onRun }) {
+export default function DifferentialPanel({ samples = [], disabled, diffcytAvailable = false, onRun }) {
   const groups = useMemo(() => {
     const counts = {};
     for (const s of samples) {
@@ -64,8 +64,10 @@ export default function DifferentialPanel({ samples = [], disabled, onRun }) {
               <span className="field__label">Engine</span>
               <select value={engine} disabled={disabled} onChange={(e) => setEngine(e.target.value)} style={sel}>
                 <option value="python">Python rank tests (always available)</option>
-                <option value="auto">diffcyt if available, else Python</option>
-                <option value="diffcyt">diffcyt (edgeR + limma, needs R)</option>
+                {diffcytAvailable && <option value="auto">diffcyt if available, else Python</option>}
+                <option value="diffcyt" disabled={!diffcytAvailable}>
+                  diffcyt (edgeR + limma){diffcytAvailable ? '' : ' — Docker deployment only'}
+                </option>
               </select>
             </label>
             <button type="button" className="run-btn" disabled={disabled || !enough} onClick={run}>

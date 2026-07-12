@@ -36,6 +36,29 @@ IMAGE_FOR = {
 }
 
 
+def engine_available(script: str) -> bool:
+    """Whether the R recipe ``script`` can actually run in this environment.
+
+    local mode: Rscript must be on PATH. docker mode: docker must be present and
+    the recipe's engine image must already be built (no implicit pull).
+    """
+    if R_MODE == "local":
+        return shutil.which("Rscript") is not None
+    if shutil.which("docker") is None:
+        return False
+    image = IMAGE_FOR.get(script)
+    if not image:
+        return False
+    try:
+        result = subprocess.run(
+            ["docker", "image", "inspect", image],
+            capture_output=True, timeout=10,
+        )
+        return result.returncode == 0
+    except Exception:  # noqa: BLE001
+        return False
+
+
 def _read_error_message(error_path: str) -> str:
     try:
         with open(error_path) as fh:
@@ -94,6 +117,25 @@ def run_r_job(script: str, jobdir: str, timeout: int = 1800) -> str:
         )
     except subprocess.TimeoutExpired:
         raise RuntimeError(f"R job {script} timed out after {timeout}s")
+    except FileNotFoundError:
+        # `docker` (or `Rscript`) not on PATH at all.
+        raise RuntimeError(
+            "R engine unavailable: this step runs in R (AutoSpectral / diffcyt), which "
+            "is only present in the Docker deployment. Start the app with "
+            "'docker compose up'."
+        )
+
+    # Docker mode with a missing engine image gives an opaque pull error; translate it.
+    if R_MODE != "local" and completed.returncode != 0:
+        blob = (completed.stderr or "") + (completed.stdout or "")
+        if any(s in blob for s in ("Unable to find image", "pull access denied",
+                                   "No such image", "manifest unknown", "repository does not exist")):
+            raise RuntimeError(
+                f"R engine image '{image}' is not built. Spectral unmixing and the "
+                f"diffcyt engine run in R and are only available in the Docker deployment. "
+                f"Start the app with 'docker compose up', or build the engine image: "
+                f"docker build -f backend/docker/Dockerfile.unmix -t {image} ."
+            )
 
     if os.path.exists(error_path):
         raise RuntimeError(_read_error_message(error_path))
