@@ -3,6 +3,8 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Runs locally](https://img.shields.io/badge/data-stays%20local-brightgreen.svg)](#privacy)
+[![Pypi Release](https://badge.fury.io/py/wakaflockaflow.svg)](https://pypi.org/project/wakaflockaflow/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/wakaflockaflow?period=total&units=INTERNATIONAL_SYSTEM&left_color=GREY&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/wakaflockaflow)
 
 WakaFlockaFlow takes spectral flow cytometry FCS files and, without any coding,
 produces named cell populations with counts, frequencies, marker profiles, and
